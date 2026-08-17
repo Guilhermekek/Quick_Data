@@ -254,7 +254,7 @@ const pres = newPres();
 
   const notes = [
     ["57%", "dos riscos são críticos ou altos — exigem atenção antes de qualquer mudança no sistema"],
-    ["0", "riscos críticos são de “lentidão” — todos são de segurança ou confiabilidade do dado"],
+    ["44 de 46", "só se resolvem mudando a arquitetura do sistema — não com ajustes pontuais na planilha atual"],
   ];
   notes.forEach((n, i) => {
     const y = 1.9 + i * 2.0;
@@ -264,49 +264,46 @@ const pres = newPres();
   footer(s, "5");
 }
 
-// ---------- S7: Por que só consertar não resolve ----------
+// ---------- S7: Consertar por partes não compensa ----------
 {
   const s = pres.addSlide();
   s.background = { color: WHITE };
-  sectionTitle(s, "A decisão", "Por que remendar a planilha não resolve");
+  sectionTitle(s, "A decisão", "Consertar por partes não compensa");
 
-  const rows = [
-    ["", "Planilha atual", "Aplicativo novo"],
-    ["Senha do banco protegida", "✗", "✓"],
-    ["Mesmo dado sempre com o mesmo resultado", "✗", "✓"],
-    ["Progresso visível, sem travar", "✗", "✓"],
-    ["Depende de poucas pessoas para manter", "✗", "✓"],
-    ["Mudanças testáveis antes de ir pro ar", "✗", "✓"],
-  ];
-
-  const tblRows = rows.map((r, ri) => {
-    const isHeader = ri === 0;
-    return r.map((cell, ci) => {
-      let color = TEXT_DARK, bold = isHeader, fill = ri % 2 === 0 ? WHITE : BG_LIGHT;
-      if (isHeader) fill = BLUE;
-      if (isHeader && ci > 0) color = WHITE;
-      if (isHeader && ci === 0) color = WHITE;
-      if (!isHeader && ci === 1) color = CRIT;
-      if (!isHeader && ci === 2) color = OK;
-      if (!isHeader && ci > 0) bold = true;
-      return {
-        text: cell,
-        options: {
-          color, bold, fill: { color: fill },
-          align: ci === 0 ? "left" : "center",
-          fontFace: FONT, fontSize: 13, valign: "middle",
-        },
-      };
-    });
+  s.addShape("roundRect", {
+    x: MARGIN, y: 1.7, w: 4.3, h: 1.7, rectRadius: 0.08, fill: { color: BG_LIGHT }, line: { type: "none" },
+  });
+  s.addText("< 5%", {
+    x: MARGIN + 0.3, y: 1.85, w: 3.7, h: 0.85, fontFace: FONT_HEAD, fontSize: 46, bold: true, color: BLUE, margin: 0,
+  });
+  s.addText("dos problemas mapeados se resolvem com ajustes pontuais na planilha atual", {
+    x: MARGIN + 0.3, y: 2.7, w: 3.7, h: 0.65, fontFace: FONT, fontSize: 12, color: TEXT_MUTED, margin: 0, lineSpacing: 15,
   });
 
-  s.addTable(tblRows, {
-    x: MARGIN, y: 1.85, w: W - MARGIN * 2, h: 4.6,
-    colW: [6.73, 2.7, 2.7],
-    border: { type: "solid", color: BORDER, pt: 0.75 },
-    autoPage: false,
-    rowH: 0.73,
+  s.addText("Por que um remendo não paga a conta", {
+    x: 5.3, y: 1.7, w: 7.4, h: 0.4, fontFace: FONT_HEAD, fontSize: 15, bold: true, color: TEXT_DARK, margin: 0,
   });
+  s.addText("Corrigir performance ou duplicação de regra direto na planilha dá um ganho que desaparece assim que a base cresce de novo — porque o problema está em como o sistema foi construído (Excel funcionando como banco de dados, sem versionamento, sem teste automático), não em um trecho isolado de código.", {
+    x: 5.3, y: 2.1, w: 7.4, h: 1.3, fontFace: FONT, fontSize: 12.5, color: TEXT_MUTED, margin: 0, lineSpacing: 17,
+  });
+
+  const colY = 3.75, colH = 2.55, colW2 = (W - MARGIN * 2 - 0.4) / 2;
+  s.addShape("roundRect", { x: MARGIN, y: colY, w: colW2, h: colH, rectRadius: 0.08, fill: { color: "FFF7ED" }, line: { type: "none" } });
+  s.addText("Consertando pontos isolados", {
+    x: MARGIN + 0.3, y: colY + 0.2, w: colW2 - 0.6, h: 0.4, fontFace: FONT_HEAD, fontSize: 13.5, bold: true, color: "9A3412", margin: 0,
+  });
+  s.addText("Resolve o sintoma mais visível do momento — até a base crescer de novo ou surgir o próximo caso não previsto. Nenhuma das causas estruturais desaparece.", {
+    x: MARGIN + 0.3, y: colY + 0.65, w: colW2 - 0.6, h: colH - 0.9, fontFace: FONT, fontSize: 12.5, color: "7C2D12", margin: 0, lineSpacing: 17,
+  });
+
+  s.addShape("roundRect", { x: MARGIN + colW2 + 0.4, y: colY, w: colW2, h: colH, rectRadius: 0.08, fill: { color: "ECFDF5" }, line: { type: "none" } });
+  s.addText("Reescrevendo em Python", {
+    x: MARGIN + colW2 + 0.7, y: colY + 0.2, w: colW2 - 0.6, h: 0.4, fontFace: FONT_HEAD, fontSize: 13.5, bold: true, color: "047857", margin: 0,
+  });
+  s.addText("Resolve a causa: um único cálculo testável por regra, dado consistente independente de quem gerou, e performance que não se degrada com o tempo.", {
+    x: MARGIN + colW2 + 0.7, y: colY + 0.65, w: colW2 - 0.6, h: colH - 0.9, fontFace: FONT, fontSize: 12.5, color: "065F46", margin: 0, lineSpacing: 17,
+  });
+
   footer(s, "6");
 }
 
@@ -458,7 +455,7 @@ function mockupSlide(title, kicker, imgFile, caption, opts) {
   sectionTitle(s, "Como chegamos lá", "Roadmap proposto");
 
   const phases = [
-    ["Fase 0", "Mitigação imediata", "Trocar a senha do banco. Confirmar com o time algumas regras que só vocês sabem responder."],
+    ["Fase 0", "Preparação", "Confirmar com o time algumas regras de negócio que só vocês sabem responder, antes de começar a reescrita de verdade."],
     ["Fase 1", "Motor de dados", "Reconstruir a lógica de cálculo em Python, validando cada regra contra o resultado da planilha atual, linha a linha."],
     ["Fase 2", "Interface", "Construir as telas (já prototipadas — veja os slides anteriores), reaproveitando o fluxo que vocês já conhecem."],
     ["Fase 3", "Transição", "Rodar em paralelo com a planilha por 1-2 fechamentos, comparando resultado, antes de aposentar o Excel."],
@@ -487,8 +484,7 @@ function mockupSlide(title, kicker, imgFile, caption, opts) {
   });
 
   const asks = [
-    "Aprovar a troca imediata da senha do banco de dados (custo baixo, já é risco hoje).",
-    "Aprovar seguir com a reescrita do Quick Data como aplicativo em Python.",
+    "Aprovar seguir com a reescrita do Quick Data como aplicativo em Python — é o único caminho que resolve as causas, não só os sintomas.",
     "Alocar tempo do time técnico sênior para conduzir a Fase 1 (motor de dados).",
     "Uma rodada curta com os analistas para validar as poucas regras de negócio que só o time sabe responder.",
   ];
