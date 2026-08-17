@@ -1,0 +1,17 @@
+# Ambiente local — não versionar
+.venv/
+__pycache__/
+*.pyc
+node_modules/
+.idea/
+.claude/
+
+# Fonte bruta do Quick Data — contém credencial de banco em texto plano
+# (achado de segurança já documentado; nunca deve ir para o GitHub)
+Quick Data 3.23.xlsb
+vba_dump_tmp/
+
+# Artefatos de build/QA
+docs/apresentacao/*.pdf
+docs/apresentacao/*.jpg
+docs/apresentacao/package-lock.json
