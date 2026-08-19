@@ -10,7 +10,6 @@ node_modules/
 # App novo (Python + React) — build gerado, não versionar
 frontend/dist/
 frontend/package-lock.json
-app/ui/
 
 # Fonte bruta do Quick Data — contém credencial de banco em texto plano
 # (achado de segurança já documentado; nunca deve ir para o GitHub)
