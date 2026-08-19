@@ -1,0 +1,116 @@
+/* Quick Data — tokens compartilhados com o TIM Pipeline Runner, tema claro por padrão */
+
+* { box-sizing: border-box; }
+html, body, #root { margin: 0; padding: 0; height: 100%; }
+body {
+  font-family: "Segoe UI", "Segoe UI Variable Text", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--fg);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; }
+button { cursor: pointer; }
+
+:root {
+  --brand-primary: #004691;
+  --brand-primary-hover: #0057b3;
+  --brand-primary-active: #003a78;
+  --brand-accent: #d10a11;
+
+  --row-h: 36px;
+  --gap: 14px;
+  --pad-card: 18px;
+  --pad-screen: 28px;
+
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-lg: 12px;
+
+  --status-ok: #16a34a;
+  --status-warn: #d97706;
+  --status-err: #dc2626;
+  --status-neutral: #64748b;
+  --status-info: #2563eb;
+
+  --shadow-1: 0 1px 2px rgba(0,0,0,.06), 0 1px 1px rgba(0,0,0,.04);
+  --shadow-2: 0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
+
+  --sidebar-w: 232px;
+  --sidebar-bg: var(--brand-primary);
+  --footer-bg: var(--brand-primary);
+  --sidebar-active-bg: #003a78;
+
+  --bg: #f4f6fa;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --surface-3: #f1f4f9;
+  --surface-hover: #eef2f8;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --fg: #0f172a;
+  --fg-strong: #000000;
+  --fg-muted: #475569;
+  --fg-faint: #64748b;
+  --sidebar-fg: #ffffff;
+  --sidebar-fg-muted: #c7d6ec;
+  --footer-fg: #ffffff;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  grid-template-rows: 1fr 44px;
+  height: 100%;
+}
+.sidebar { grid-row: 1 / 3; background: var(--sidebar-bg); color: var(--sidebar-fg); display: flex; flex-direction: column; padding: 18px 0 16px; }
+.main    { grid-column: 2; grid-row: 1; background: var(--bg); overflow: auto; min-width: 0; }
+.footer  { grid-column: 2; grid-row: 2; background: var(--footer-bg); color: var(--footer-fg); display: flex; align-items: center; justify-content: space-between; padding: 0 var(--pad-screen); font-size: 11px; }
+
+.logo-mark { display: flex; align-items: center; gap: 8px; padding: 0 20px 18px; font-weight: 700; font-size: 17px; }
+.logo-mark .tri { width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 11px solid var(--brand-accent); }
+
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 20px; margin: 1px 8px; border-radius: var(--radius-sm);
+  color: var(--sidebar-fg-muted); font-size: 13px; cursor: pointer; user-select: none;
+}
+.nav-item:hover { background: rgba(255,255,255,.08); color: #fff; }
+.nav-item.active { background: var(--sidebar-active-bg); color: #fff; font-weight: 600; }
+
+.screen { padding: var(--pad-screen); max-width: 1200px; }
+.screen h1 { font-size: 20px; margin: 0 0 4px; }
+.screen .subtitle { color: var(--fg-muted); font-size: 13px; margin: 0 0 22px; }
+
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1); padding: var(--pad-card);
+}
+
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 16px; border-radius: var(--radius-sm); border: 1px solid transparent;
+  font-size: 13px; font-weight: 600;
+}
+.btn-primary { background: var(--brand-primary); color: #fff; }
+.btn-primary:hover { background: var(--brand-primary-hover); }
+.btn-secondary { background: var(--surface); color: var(--fg); border-color: var(--border-strong); }
+.btn-secondary:hover { background: var(--surface-hover); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+table.sheet-list { width: 100%; border-collapse: collapse; margin-top: 16px; }
+table.sheet-list th { text-align: left; font-size: 11px; text-transform: uppercase; color: var(--fg-faint); padding: 8px 10px; border-bottom: 1px solid var(--border); }
+table.sheet-list td { padding: 8px 10px; border-bottom: 1px solid var(--border); font-size: 13px; }
+table.sheet-list tr:hover td { background: var(--surface-hover); }
+
+.badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+.badge-front { background: #dbeafe; color: #1e40af; }
+.badge-infra { background: var(--surface-3); color: var(--fg-faint); }
+
+.toast {
+  margin-top: 16px; padding: 12px 14px; border-radius: var(--radius); font-size: 13px;
+}
+.toast-ok { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+.toast-err { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }

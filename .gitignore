@@ -1,15 +1,24 @@
 # Ambiente local — não versionar
 .venv/
+.venv312/
 __pycache__/
 *.pyc
 node_modules/
 .idea/
 .claude/
 
+# App novo (Python + React) — build gerado, não versionar
+frontend/dist/
+frontend/package-lock.json
+app/ui/
+
 # Fonte bruta do Quick Data — contém credencial de banco em texto plano
 # (achado de segurança já documentado; nunca deve ir para o GitHub)
 Quick Data 3.23.xlsb
 vba_dump_tmp/
+
+# Cópia recebida para análise pontual (37MB, dado real de terceiros) — nunca versionar
+QD 3.23 - P2_vf.xlsx
 
 # Artefatos de build/QA
 docs/apresentacao/*.pdf

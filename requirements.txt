@@ -1,0 +1,5 @@
+# Requer Python 3.11 ou 3.12 (mesma restrição do projeto FIT — pythonnet,
+# dependência transitiva do pywebview no Windows, não tem wheel pra 3.13/3.14).
+pywebview>=5.0,<7
+openpyxl>=3.1,<4
+pandas>=2.2,<3
