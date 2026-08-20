@@ -1475,6 +1475,98 @@ a:hover { color: var(--brand-primary-hover); text-decoration: underline; }
     </div>
   </sc-if>
 
+  <sc-if value="{{ modalExtract }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeModal }}" style="position: fixed; inset: 0; background: rgba(8,12,24,.55); backdrop-filter: blur(2px); display: grid; place-items: center; z-index: 100; animation: fadeIn .15s ease-out">
+      <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-pop); width: 560px; max-width: calc(100vw - 40px); overflow: visible; animation: popIn .18s cubic-bezier(.2,.7,.3,1)">
+        <div style="padding: 18px 24px 14px; border-bottom: 1px solid var(--border)">
+          <h3 style="margin: 0 0 2px; font-size: 16px; font-weight: 600">Parâmetros de extração — {{ extractModal.source }}</h3>
+          <p style="margin: 0; font-size: 12px; color: var(--fg-muted)">Mesmos campos que a aba "Extração" da planilha original pedia antes de rodar essa fonte.</p>
+        </div>
+        <div style="padding: 20px 24px; display: flex; flex-direction: column; gap: 16px">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px">
+            <sc-if value="{{ extractModal.hasKpi }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 6px; position: relative">
+                <label style="font-size: 12px; font-weight: 500; color: var(--fg-muted)">KPI &gt; Versão</label>
+                <button onClick="{{ extractModal.kpiDrop.toggle }}" style="height: var(--row-h); padding: 0 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); color: var(--fg); font-size: 13px; text-align: left" style-hover="background: var(--surface-hover)">{{ extractModal.kpiDrop.value }}<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="var(--fg-faint)" style="flex: none"><path d="m5 9 7 7 7-7" stroke-width="2" stroke-linecap="round"></path></svg></button>
+                <sc-if value="{{ extractModal.kpiDrop.open }}" hint-placeholder-val="{{ false }}">
+                  <div style="position: absolute; top: 100%; left: 0; right: 0; z-index: 5; margin-top: 4px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow-pop); overflow: hidden; max-height: 220px; overflow-y: auto">
+                    <sc-for list="{{ extractModal.kpiDrop.options }}" as="opt" hint-placeholder-count="4">
+                      <button onClick="{{ opt.pick }}" style="display: block; width: 100%; padding: 9px 12px; background: transparent; border: 0; border-bottom: 1px solid var(--border); text-align: left; color: var(--fg); font-size: 12.5px" style-hover="background: var(--surface-hover)">{{ opt.value }}</button>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-if>
+            <sc-if value="{{ extractModal.hasAno }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 6px">
+                <label style="font-size: 12px; font-weight: 500; color: var(--fg-muted)">Ano</label>
+                <input value="{{ extractModal.ano }}" onChange="{{ extractModal.setAno }}" style="height: var(--row-h); padding: 0 12px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); color: var(--fg); font-size: 13px" />
+              </div>
+            </sc-if>
+            <sc-if value="{{ extractModal.hasAba }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 6px">
+                <label style="font-size: 12px; font-weight: 500; color: var(--fg-muted)">Aba de origem (no arquivo)</label>
+                <input value="{{ extractModal.aba }}" onChange="{{ extractModal.setAba }}" placeholder="ex.: MockUp" style="height: var(--row-h); padding: 0 12px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); color: var(--fg); font-size: 13px" />
+              </div>
+            </sc-if>
+            <sc-if value="{{ extractModal.hasMesIni }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 6px; position: relative">
+                <label style="font-size: 12px; font-weight: 500; color: var(--fg-muted)">Mês inicial</label>
+                <button onClick="{{ extractModal.mesIniDrop.toggle }}" style="height: var(--row-h); padding: 0 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); color: var(--fg); font-size: 13px; text-align: left" style-hover="background: var(--surface-hover)">{{ extractModal.mesIniDrop.value }}<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="var(--fg-faint)" style="flex: none"><path d="m5 9 7 7 7-7" stroke-width="2" stroke-linecap="round"></path></svg></button>
+                <sc-if value="{{ extractModal.mesIniDrop.open }}" hint-placeholder-val="{{ false }}">
+                  <div style="position: absolute; top: 100%; left: 0; right: 0; z-index: 5; margin-top: 4px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow-pop); overflow: hidden; max-height: 220px; overflow-y: auto">
+                    <sc-for list="{{ extractModal.mesIniDrop.options }}" as="opt" hint-placeholder-count="4">
+                      <button onClick="{{ opt.pick }}" style="display: block; width: 100%; padding: 9px 12px; background: transparent; border: 0; border-bottom: 1px solid var(--border); text-align: left; color: var(--fg); font-size: 12.5px" style-hover="background: var(--surface-hover)">{{ opt.value }}</button>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-if>
+            <sc-if value="{{ extractModal.hasMesFim }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 6px; position: relative">
+                <label style="font-size: 12px; font-weight: 500; color: var(--fg-muted)">Mês final</label>
+                <button onClick="{{ extractModal.mesFimDrop.toggle }}" style="height: var(--row-h); padding: 0 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); color: var(--fg); font-size: 13px; text-align: left" style-hover="background: var(--surface-hover)">{{ extractModal.mesFimDrop.value }}<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="var(--fg-faint)" style="flex: none"><path d="m5 9 7 7 7-7" stroke-width="2" stroke-linecap="round"></path></svg></button>
+                <sc-if value="{{ extractModal.mesFimDrop.open }}" hint-placeholder-val="{{ false }}">
+                  <div style="position: absolute; top: 100%; left: 0; right: 0; z-index: 5; margin-top: 4px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow-pop); overflow: hidden; max-height: 220px; overflow-y: auto">
+                    <sc-for list="{{ extractModal.mesFimDrop.options }}" as="opt" hint-placeholder-count="4">
+                      <button onClick="{{ opt.pick }}" style="display: block; width: 100%; padding: 9px 12px; background: transparent; border: 0; border-bottom: 1px solid var(--border); text-align: left; color: var(--fg); font-size: 12.5px" style-hover="background: var(--surface-hover)">{{ opt.value }}</button>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-if>
+            <sc-if value="{{ extractModal.hasMesPreview }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 6px; position: relative">
+                <label style="font-size: 12px; font-weight: 500; color: var(--fg-muted)">Mês preview</label>
+                <button onClick="{{ extractModal.mesPreviewDrop.toggle }}" style="height: var(--row-h); padding: 0 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); color: var(--fg); font-size: 13px; text-align: left" style-hover="background: var(--surface-hover)">{{ extractModal.mesPreviewDrop.value }}<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="var(--fg-faint)" style="flex: none"><path d="m5 9 7 7 7-7" stroke-width="2" stroke-linecap="round"></path></svg></button>
+                <sc-if value="{{ extractModal.mesPreviewDrop.open }}" hint-placeholder-val="{{ false }}">
+                  <div style="position: absolute; top: 100%; left: 0; right: 0; z-index: 5; margin-top: 4px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow-pop); overflow: hidden; max-height: 220px; overflow-y: auto">
+                    <sc-for list="{{ extractModal.mesPreviewDrop.options }}" as="opt" hint-placeholder-count="4">
+                      <button onClick="{{ opt.pick }}" style="display: block; width: 100%; padding: 9px 12px; background: transparent; border: 0; border-bottom: 1px solid var(--border); text-align: left; color: var(--fg); font-size: 12.5px" style-hover="background: var(--surface-hover)">{{ opt.value }}</button>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-if>
+          </div>
+          <sc-if value="{{ extractModal.hasArquivo }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; gap: 6px">
+              <label style="font-size: 12px; font-weight: 500; color: var(--fg-muted)">Arquivo de origem</label>
+              <button onClick="{{ extractModal.pickFile }}" style="height: var(--row-h); padding: 0 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); color: var(--fg); font-size: 13px; text-align: left" style-hover="background: var(--surface-hover)">
+                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ extractModal.arquivoLabel }}</span>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--fg-faint)" style="flex: none"><rect x="3" y="4" width="18" height="16" rx="2" stroke-width="1.7"></rect><path d="m3 17 5-5 4 4 3-3 6 6" stroke-width="1.7" stroke-linejoin="round"></path></svg>
+              </button>
+            </div>
+          </sc-if>
+        </div>
+        <div style="padding: 14px 24px; border-top: 1px solid var(--border); background: var(--surface-2); display: flex; align-items: center; justify-content: flex-end; gap: 8px">
+          <button onClick="{{ closeModal }}" style="height: var(--row-h); padding: 0 14px; border-radius: var(--radius); border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg); font-size: 13px; font-weight: 600" style-hover="background: var(--surface-hover)">Cancelar</button>
+          <button onClick="{{ extractModal.confirm }}" disabled="{{ !extractModal.canConfirm }}" style="height: var(--row-h); padding: 0 16px; border-radius: var(--radius); border: 1px solid var(--brand-primary); background: var(--brand-primary); color: #fff; font-size: 13px; font-weight: 600" style-hover="background: var(--brand-primary-hover)">Extrair</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
   <sc-if value="{{ modalCancel }}" hint-placeholder-val="{{ false }}">
     <div onClick="{{ closeModal }}" style="position: fixed; inset: 0; background: rgba(8,12,24,.55); backdrop-filter: blur(2px); display: grid; place-items: center; z-index: 100; animation: fadeIn .15s ease-out">
       <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-pop); width: 460px; max-width: calc(100vw - 40px); overflow: hidden; animation: popIn .18s cubic-bezier(.2,.7,.3,1)">
@@ -1924,6 +2016,12 @@ class Component extends DCLogic {
     teamsTested: false,
     errorPopup: null,
     successPopup: null,
+    extractSource: null,
+    extractDropdownOpen: null,
+    extractForm: {
+      kpi: "ACT > Divulgado", ano: String(new Date().getFullYear()),
+      arquivo: null, aba: "", mesIni: "Jan", mesFim: "Dez", mesPreview: "Jan",
+    },
     selUser: null,
     newUser: { id: "", name: "", area: "P&C · Consolidation", role: "user" },
     users: [
@@ -1997,6 +2095,34 @@ class Component extends DCLogic {
     "Aplicando Bases_DE_PARA.xlsx",
     "Gravando BASE QUICK DATA",
   ];
+
+  // Combinação KPI > Versão — mesma lista fechada de fechamento que o
+  // Quick Data original soma (via UNION) à lista dinâmica vinda do SQL
+  // Server (RN-094, Refresh_Sup_Linhas.bas:376-413). Sem acesso ao SQL
+  // aqui, fixamos só a parte fechada.
+  KPI_VERSAO_OPTIONS = [
+    "ACT > Divulgado", "ACT > Preview 1", "ACT > Preview 2", "ACT > Preview 3",
+    "ACT > Preview 4", "ACT > Preview 5", "ACT > Preview 6",
+    "ACT > Pré-Closing", "ACT > AJ_Pré-Closing",
+  ];
+
+  // Quais campos cada fonte pede antes de extrair, validado contra o VBA
+  // original (cada Extracao_Base_*.bas lê um conjunto de células
+  // diferente — ver docs/tech/A_12_catalogo_regras_negocio.md). "HUBBLE"
+  // no original é uma grade de filtros + SQL, não arquivo — aqui fica
+  // simplificado a KPI + intervalo de mês até essa tela ganhar uma versão
+  // própria. "AJUSTES" não lê nenhum parâmetro externo no original.
+  EXTRACT_FIELDS = {
+    "HUBBLE": ["kpi", "mesIni", "mesFim"],
+    "BASE 1009": ["kpi", "arquivo", "mesIni", "mesFim"],
+    "RGM": ["kpi", "ano", "arquivo", "mesIni", "mesFim"],
+    "MOCKUP RGM": ["kpi", "ano", "arquivo", "aba", "mesIni", "mesFim"],
+    "FIXED REVENUES": ["kpi", "ano", "arquivo", "cenarios"],
+    "OTHER INCOME": ["pasta", "criterio", "mesIni", "mesFim"],
+    "BASE CONSOLIDADA": ["kpi", "arquivo", "mesPreview"],
+    "QUICK DATA": ["arquivo", "mesIni", "mesFim"],
+    "AJUSTES": [],
+  };
 
   componentDidMount() {
     this.applyDoc();
@@ -2178,6 +2304,57 @@ class Component extends DCLogic {
       arr.splice(toIdx, 0, moved);
       return { customTabs: arr };
     }, this.saveCustomTabs);
+  };
+
+  // Antes de extrair, pede os parâmetros daquela fonte — no Quick Data
+  // original isso não era um popup, era um bloco de células fixas na aba
+  // "Extração" (KPI/Versão/Ano/Mês/Diretório/Arquivo, um layout diferente
+  // por fonte — ver EXTRACT_FIELDS e RN-008/RN-013/RN-030 na doc técnica).
+  // Fontes sem parâmetro nenhum no original (AJUSTES) pulam direto pra
+  // extração, como lá.
+  openExtractParams = (source) => () => {
+    const fields = this.EXTRACT_FIELDS[source] || [];
+    if (fields.length === 0) {
+      this.startRun(source)();
+      return;
+    }
+    this.setState(s => ({
+      modal: "extract", extractSource: source, extractDropdownOpen: null,
+      extractForm: { ...s.extractForm, arquivo: null, aba: "", pasta: null, criterio: "" },
+    }));
+  };
+
+  setExtractField = (key) => (e) => {
+    const value = e.target.value;
+    this.setState(s => ({ extractForm: { ...s.extractForm, [key]: value } }));
+  };
+
+  toggleExtractDropdown = (key) => () => this.setState(s => ({
+    extractDropdownOpen: s.extractDropdownOpen === key ? null : key,
+  }));
+
+  pickExtractOption = (fieldKey, value) => () => this.setState(s => ({
+    extractForm: { ...s.extractForm, [fieldKey]: value }, extractDropdownOpen: null,
+  }));
+
+  pickExtractFile = async () => {
+    if (!window.pywebview || !window.pywebview.api) {
+      this.setState({ toast: "App Python não conectado — abra pelo executável (não pelo navegador)." });
+      return;
+    }
+    const path = await window.pywebview.api.pick_file();
+    if (!path) return;
+    this.setState(s => ({ extractForm: { ...s.extractForm, arquivo: path } }));
+  };
+
+  confirmExtractParams = () => {
+    const source = this.state.extractSource;
+    this.setState({ modal: null, extractDropdownOpen: null });
+    if (source === "RGM" || source === "MOCKUP RGM") {
+      this.openError(source === "RGM" ? "sql" : "file")();
+      return;
+    }
+    this.startRun(source)();
   };
 
   startRun = (src) => () => {
@@ -2490,11 +2667,14 @@ class Component extends DCLogic {
       { name: "AJUSTES", table: "Base de ajustes manuais", rows: "146", last: "há 20min", tone: "info", label: "6 linhas novas" },
     ];
     const toneColor = { ok: "var(--status-ok)", warn: "var(--status-warn)", err: "var(--status-err)", neutral: "var(--status-neutral)", info: "var(--status-info)" };
-    const failMap = { RGM: "sql", "MOCKUP RGM": "file" };
+    // MOCKUP RGM ainda não tem sua tela de parâmetros própria (aba de
+    // origem + Ano) — segue direto pro erro simulado, como antes. RGM já
+    // passa pelo modal de parâmetros e só erra na confirmação.
+    const failMap = { "MOCKUP RGM": "file" };
     const sources = SOURCES.map(x => ({
       ...x,
       color: toneColor[x.tone],
-      run: failMap[x.name] ? this.openError(failMap[x.name]) : this.startRun(x.name),
+      run: failMap[x.name] ? this.openError(failMap[x.name]) : this.openExtractParams(x.name),
     }));
 
     const MONTHS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
@@ -2871,6 +3051,35 @@ class Component extends DCLogic {
       askClear: this.openModal("clear"), closeModal: this.closeModal,
       openExport: this.openIO("export"), openImport: this.openIO("import"),
       modalIO: s.modal === "io", modalCancel: s.modal === "cancel", modalClear: s.modal === "clear", modalInfo: s.modal === "info",
+      modalExtract: s.modal === "extract",
+      extractModal: (() => {
+        const fields = this.EXTRACT_FIELDS[s.extractSource] || [];
+        const has = (k) => fields.includes(k);
+        const f = s.extractForm;
+        const needsFile = has("arquivo") && !f.arquivo;
+        const open = s.extractDropdownOpen;
+        const dropdown = (key, current, options) => ({
+          open: open === key, toggle: this.toggleExtractDropdown(key),
+          value: current,
+          options: options.map(v => ({ value: v, pick: this.pickExtractOption(key, v) })),
+        });
+        return {
+          source: s.extractSource,
+          hasKpi: has("kpi"), hasAno: has("ano"), hasArquivo: has("arquivo"),
+          hasAba: has("aba"), hasMesIni: has("mesIni"), hasMesFim: has("mesFim"),
+          hasMesPreview: has("mesPreview"),
+          ano: f.ano, aba: f.aba,
+          arquivoLabel: f.arquivo ? f.arquivo.split("\\").pop() : "Nenhum arquivo selecionado",
+          setAno: this.setExtractField("ano"), setAba: this.setExtractField("aba"),
+          pickFile: this.pickExtractFile,
+          kpiDrop: dropdown("kpi", f.kpi, this.KPI_VERSAO_OPTIONS),
+          mesIniDrop: dropdown("mesIni", f.mesIni, MONTHS),
+          mesFimDrop: dropdown("mesFim", f.mesFim, MONTHS),
+          mesPreviewDrop: dropdown("mesPreview", f.mesPreview, MONTHS),
+          canConfirm: !needsFile,
+          confirm: this.confirmExtractParams,
+        };
+      })(),
       openInfo: this.openModal("info"),
       ioTitle: s.ioMode === "export" ? "Exportar BASE e/ou FRONT(S)" : "Importar BASE e/ou FRONT(S)",
       ioVerb: s.ioMode === "export" ? "Exportar" : "Importar",
