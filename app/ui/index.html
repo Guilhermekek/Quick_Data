@@ -1482,7 +1482,7 @@ a:hover { color: var(--brand-primary-hover); text-decoration: underline; }
           <h3 style="margin: 0 0 2px; font-size: 16px; font-weight: 600">Parâmetros de extração — {{ extractModal.source }}</h3>
           <p style="margin: 0; font-size: 12px; color: var(--fg-muted)">Mesmos campos que a aba "Extração" da planilha original pedia antes de rodar essa fonte.</p>
         </div>
-        <div style="padding: 20px 24px; display: flex; flex-direction: column; gap: 16px">
+        <div style="padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; max-height: calc(100vh - 160px); overflow-y: auto">
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px">
             <sc-if value="{{ extractModal.hasKpi }}" hint-placeholder-val="{{ false }}">
               <div style="display: flex; flex-direction: column; gap: 6px; position: relative">
@@ -1571,6 +1571,32 @@ a:hover { color: var(--brand-primary-hover); text-decoration: underline; }
             <div style="display: flex; flex-direction: column; gap: 6px">
               <label style="font-size: 12px; font-weight: 500; color: var(--fg-muted)">Critério de nome do arquivo</label>
               <input value="{{ extractModal.criterio }}" onChange="{{ extractModal.setCriterio }}" placeholder="ex.: Other_Income_* (aceita * como coringa)" style="height: var(--row-h); padding: 0 12px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); color: var(--fg); font-size: 13px" />
+            </div>
+          </sc-if>
+          <sc-if value="{{ extractModal.hasCenarios }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; gap: 6px">
+              <label style="font-size: 12px; font-weight: 500; color: var(--fg-muted)">Cenário por mês — não é um intervalo, cada mês tem sua própria versão</label>
+              <div style="border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden">
+                <div style="display: grid; grid-template-columns: 56px 1fr 90px; gap: 10px; padding: 8px 12px; background: var(--surface-2); border-bottom: 1px solid var(--border); font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--fg-faint)">
+                  <div>Mês</div><div>Cenário</div><div style="text-align: right">Data</div>
+                </div>
+                <sc-for list="{{ extractModal.cenarioRows }}" as="row" hint-placeholder-count="12">
+                  <div style="display: grid; grid-template-columns: 56px 1fr 90px; gap: 10px; align-items: center; padding: 6px 12px; border-bottom: 1px solid var(--border); position: relative">
+                    <div style="font-size: 12.5px; font-weight: 600">{{ row.month }}</div>
+                    <div style="position: relative">
+                      <button onClick="{{ row.drop.toggle }}" style="width: 100%; height: 30px; padding: 0 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); color: var(--fg); font-size: 12px; text-align: left" style-hover="background: var(--surface-hover)">{{ row.drop.value }}<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="var(--fg-faint)" style="flex: none"><path d="m5 9 7 7 7-7" stroke-width="2" stroke-linecap="round"></path></svg></button>
+                      <sc-if value="{{ row.drop.open }}" hint-placeholder-val="{{ false }}">
+                        <div style="position: absolute; top: 100%; left: 0; right: 0; z-index: 6; margin-top: 4px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow-pop); overflow: hidden; max-height: 200px; overflow-y: auto">
+                          <sc-for list="{{ row.drop.options }}" as="opt" hint-placeholder-count="4">
+                            <button onClick="{{ opt.pick }}" style="display: block; width: 100%; padding: 8px 10px; background: transparent; border: 0; border-bottom: 1px solid var(--border); text-align: left; color: var(--fg); font-size: 12px" style-hover="background: var(--surface-hover)">{{ opt.value }}</button>
+                          </sc-for>
+                        </div>
+                      </sc-if>
+                    </div>
+                    <div style="text-align: right; font-size: 11.5px; color: var(--fg-faint); font-family: 'Cascadia Mono', Consolas, ui-monospace, monospace">{{ row.dataLabel }}</div>
+                  </div>
+                </sc-for>
+              </div>
             </div>
           </sc-if>
         </div>
@@ -2036,7 +2062,7 @@ class Component extends DCLogic {
     extractForm: {
       kpi: "ACT > Divulgado", ano: String(new Date().getFullYear()),
       arquivo: null, aba: "", mesIni: "Jan", mesFim: "Dez", mesPreview: "Jan",
-      pasta: null, criterio: "",
+      pasta: null, criterio: "", cenarios: {},
     },
     selUser: null,
     newUser: { id: "", name: "", area: "P&C · Consolidation", role: "user" },
@@ -2336,7 +2362,7 @@ class Component extends DCLogic {
     }
     this.setState(s => ({
       modal: "extract", extractSource: source, extractDropdownOpen: null,
-      extractForm: { ...s.extractForm, arquivo: null, aba: "", pasta: null, criterio: "" },
+      extractForm: { ...s.extractForm, arquivo: null, aba: "", pasta: null, criterio: "", cenarios: {} },
     }));
   };
 
@@ -2351,6 +2377,14 @@ class Component extends DCLogic {
 
   pickExtractOption = (fieldKey, value) => () => this.setState(s => ({
     extractForm: { ...s.extractForm, [fieldKey]: value }, extractDropdownOpen: null,
+  }));
+
+  // Fixed Revenues não usa Mês Inicial/Final — o original tem uma grade
+  // de 12 linhas (uma por mês) com um Cenário próprio cada (Extracao_
+  // Fixed_Revenues.bas:59-88), não um intervalo contínuo.
+  pickCenario = (month, value) => () => this.setState(s => ({
+    extractForm: { ...s.extractForm, cenarios: { ...s.extractForm.cenarios, [month]: value } },
+    extractDropdownOpen: null,
   }));
 
   pickExtractFile = async () => {
@@ -3092,11 +3126,24 @@ class Component extends DCLogic {
           value: current,
           options: options.map(v => ({ value: v, pick: this.pickExtractOption(key, v) })),
         });
+        const cenarioRows = has("cenarios") ? MONTHS.map((m, idx) => {
+          const key = "cenario_" + m;
+          const current = f.cenarios[m] || "ACT > Divulgado";
+          return {
+            month: m,
+            dataLabel: f.ano + String(idx + 1).padStart(2, "0"),
+            drop: {
+              open: open === key, toggle: this.toggleExtractDropdown(key), value: current,
+              options: this.KPI_VERSAO_OPTIONS.map(v => ({ value: v, pick: this.pickCenario(m, v) })),
+            },
+          };
+        }) : [];
         return {
           source: s.extractSource,
           hasKpi: has("kpi"), hasAno: has("ano"), hasArquivo: has("arquivo"),
           hasAba: has("aba"), hasMesIni: has("mesIni"), hasMesFim: has("mesFim"),
           hasMesPreview: has("mesPreview"), hasPasta: has("pasta"), hasCriterio: has("criterio"),
+          hasCenarios: has("cenarios"),
           ano: f.ano, aba: f.aba, criterio: f.criterio,
           arquivoLabel: f.arquivo ? f.arquivo.split("\\").pop() : "Nenhum arquivo selecionado",
           pastaLabel: f.pasta || "Nenhuma pasta selecionada",
@@ -3107,6 +3154,7 @@ class Component extends DCLogic {
           mesIniDrop: dropdown("mesIni", f.mesIni, MONTHS),
           mesFimDrop: dropdown("mesFim", f.mesFim, MONTHS),
           mesPreviewDrop: dropdown("mesPreview", f.mesPreview, MONTHS),
+          cenarioRows,
           canConfirm: !needsFile,
           confirm: this.confirmExtractParams,
         };
