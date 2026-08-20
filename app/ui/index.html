@@ -62,8 +62,9 @@ a:hover { color: var(--brand-primary-hover); text-decoration: underline; }
 </style>
 </helmet>
 
-<div style="display: grid; grid-template-columns: var(--sidebar-w) 1fr; grid-template-rows: 1fr 56px; height: 100vh; min-height: 100vh; background: var(--bg)">
+<div style="display: grid; grid-template-columns: {{ gridCols }}; grid-template-rows: 1fr 56px; height: 100vh; min-height: 100vh; background: var(--bg)">
 
+  <sc-if value="{{ !fullscreenOn }}" hint-placeholder-val="{{ true }}">
   <aside style="grid-row: 1 / 3; background: var(--sidebar-bg); color: var(--sidebar-fg); display: flex; flex-direction: column; padding: 18px 0 16px; overflow-y: auto">
     <div style="padding: 6px 22px 22px; display: flex; align-items: center; gap: 10px">
       <div style="display: flex; align-items: center; gap: 6px">
@@ -175,8 +176,9 @@ a:hover { color: var(--brand-primary-hover); text-decoration: underline; }
       <div style="font-size: 10px; color: var(--sidebar-fg-muted); letter-spacing: .04em; padding-top: 4px">Quick Data v4.0.0-beta · substitui 3.23</div>
     </div>
   </aside>
+  </sc-if>
 
-  <main style="grid-column: 2; grid-row: 1; background: var(--bg); overflow: auto; min-width: 0">
+  <main style="grid-column: {{ mainCol }}; grid-row: 1; background: var(--bg); overflow: auto; min-width: 0">
 
     <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
       <div data-screen-label="Painel Principal" style="padding: var(--pad-screen); max-width: 1400px">
@@ -600,13 +602,21 @@ a:hover { color: var(--brand-primary-hover); text-decoration: underline; }
     </sc-if>
 
     <sc-if value="{{ isResults }}" hint-placeholder-val="{{ false }}">
-      <div data-screen-label="Main Results" style="padding: var(--pad-screen); max-width: 1400px">
+      <div data-screen-label="Main Results" style="padding: var(--pad-screen); max-width: {{ screenMaxWidth1400 }}">
         <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 22px">
           <div>
             <h1 style="margin: 0 0 4px; font-size: 22px; font-weight: 600; letter-spacing: -.01em">Main Results</h1>
             <p style="margin: 0; color: var(--fg-muted); font-size: 13px">BASE QUICK DATA · ACT &gt; Divulgado · 2026 · valores em R$ mil</p>
           </div>
           <div style="display: flex; gap: 8px; align-items: center">
+            <button onClick="{{ toggleFullscreen }}" title="{{ fullscreenLabel }}" style="display: inline-flex; align-items: center; justify-content: center; width: var(--row-h); height: var(--row-h); padding: 0; border-radius: var(--radius); border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg)" style-hover="background: var(--surface-hover)">
+              <sc-if value="{{ fullscreenOn }}" hint-placeholder-val="{{ false }}">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"><path d="M9 3v4a2 2 0 0 1-2 2H3M15 3v4a2 2 0 0 0 2 2h4M3 15h4a2 2 0 0 1 2 2v4M21 15h-4a2 2 0 0 0-2 2v4" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              </sc-if>
+              <sc-if value="{{ !fullscreenOn }}" hint-placeholder-val="{{ true }}">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m9 0h3a2 2 0 0 0 2-2v-3" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              </sc-if>
+            </button>
             <button style="display: inline-flex; align-items: center; gap: 8px; height: var(--row-h); padding: 0 14px; border-radius: var(--radius); border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg); font-size: 13px; font-weight: 600" style-hover="background: var(--surface-hover)">
               <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"><path d="M9 9v10a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1h-9a1 1 0 0 0-1 1zM5 16V5a1 1 0 0 1 1-1h10" stroke-width="1.7" stroke-linejoin="round"></path></svg>Copiar seleção
             </button>
@@ -680,9 +690,39 @@ a:hover { color: var(--brand-primary-hover); text-decoration: underline; }
               <thead>
                 <tr>
                   <th style="position: sticky; left: 0; z-index: 3; text-align: left; font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #fff; padding: 11px 16px; background: var(--brand-primary); border-right: 2px solid var(--brand-primary-active); min-width: 280px">Linha P&amp;L</th>
-                  <sc-for list="{{ months }}" as="m" hint-placeholder-count="12">
-                    <th style="text-align: right; font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #fff; padding: 11px 14px; background: var(--brand-primary); white-space: nowrap; min-width: 92px">{{ m }}</th>
+                  <th style="width: 54px; background: var(--brand-primary)"></th>
+                  <sc-for list="{{ resultsColumns }}" as="col" hint-placeholder-count="12">
+                    <th style="text-align: right; font-size: 10.5px; font-weight: 700; letter-spacing: .04em; color: #fff; padding: 11px 10px 11px 14px; background: var(--brand-primary); white-space: nowrap; min-width: {{ col.colWidth }}; position: relative">
+                      <div style="display: flex; align-items: center; justify-content: flex-end; gap: 2px">
+                        <input value="{{ col.label }}" onChange="{{ col.rename }}" style="width: 52px; border: 0; background: transparent; color: #fff; font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; text-align: right; padding: 0" />
+                        <button onClick="{{ col.toggleWidth }}" title="Largura da coluna" style="display: grid; place-items: center; width: 16px; height: 16px; padding: 0; border-radius: 50%; border: 0; background: transparent; color: #fff; flex: none; font-size: 11px" style-hover="background: rgba(255,255,255,.28)">↔</button>
+                        <sc-if value="{{ col.canDelete }}" hint-placeholder-val="{{ true }}">
+                          <button onClick="{{ col.toggleConfirm }}" title="Remover coluna" style="display: grid; place-items: center; width: 16px; height: 16px; padding: 0; border-radius: 50%; border: 0; background: transparent; color: #fff; flex: none" style-hover="background: rgba(255,255,255,.28)">
+                            <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" style="display: block"><path d="M6 6l12 12M18 6 6 18" stroke-width="2.6" stroke-linecap="round"></path></svg>
+                          </button>
+                        </sc-if>
+                      </div>
+                      <sc-if value="{{ col.confirmOpen }}" hint-placeholder-val="{{ false }}">
+                        <div style="{{ col.confirmPopStyle }} padding: 10px; width: 170px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow-pop); text-align: left; text-transform: none; letter-spacing: normal">
+                          <div style="font-size: 11.5px; color: var(--fg); margin-bottom: 8px; line-height: 1.4">Remover a coluna {{ col.label }} de todas as linhas?</div>
+                          <div style="display: flex; gap: 6px; justify-content: flex-end">
+                            <button onClick="{{ col.toggleConfirm }}" style="height: 24px; padding: 0 8px; border-radius: 4px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg); font-size: 11px; font-weight: 600">Cancelar</button>
+                            <button onClick="{{ col.confirmDelete }}" style="height: 24px; padding: 0 8px; border-radius: 4px; border: 1px solid var(--status-err); background: var(--status-err); color: #fff; font-size: 11px; font-weight: 600">Remover</button>
+                          </div>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ col.widthOpen }}" hint-placeholder-val="{{ false }}">
+                        <div style="{{ col.widthPopStyle }} padding: 6px; width: 140px; display: flex; flex-direction: column; gap: 2px; text-align: left; text-transform: none; letter-spacing: normal; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow-pop)">
+                          <sc-for list="{{ col.widthOptions }}" as="opt" hint-placeholder-count="5">
+                            <button onClick="{{ opt.pick }}" style="padding: 4px 8px; border-radius: 4px; border: 0; background: transparent; color: var(--fg); font-size: 11px; text-align: left" style-hover="background: var(--surface-hover)">{{ opt.label }}</button>
+                          </sc-for>
+                        </div>
+                      </sc-if>
+                    </th>
                   </sc-for>
+                  <th style="width: 32px; background: var(--brand-primary)">
+                    <button onClick="{{ addResultColumn }}" title="Adicionar coluna" style="display: grid; place-items: center; width: 100%; height: 100%; padding: 0; border: 0; border-left: 1px dashed rgba(255,255,255,.4); background: transparent; color: #fff; font-size: 15px; font-weight: 700">+</button>
+                  </th>
                   <th style="text-align: right; font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #fff; padding: 11px 16px; background: var(--brand-primary-active); white-space: nowrap; min-width: 104px">FY 2026</th>
                   <th style="width: 36px; background: var(--brand-primary)"></th>
                 </tr>
@@ -690,18 +730,77 @@ a:hover { color: var(--brand-primary-hover); text-decoration: underline; }
               <tbody>
                 <sc-for list="{{ pivotRows }}" as="p" hint-placeholder-count="14">
                   <tr style-hover="background: var(--row-hover)">
-                    <td style="position: sticky; left: 0; z-index: 2; height: var(--row-h); padding: 0 16px 0 {{ p.pad }}px; background: var(--surface); border-bottom: 1px solid var(--border); border-right: 2px solid var(--border-strong); white-space: nowrap">
-                      <input value="{{ p.label }}" onChange="{{ p.renameLabel }}" style="width: 100%; border: 0; background: transparent; color: var(--fg); font-weight: {{ p.weight }}; font-style: {{ p.italic }}; font-size: 12.5px" />
+                    <td style="position: sticky; left: 0; z-index: 2; height: {{ p.rowHeight }}; padding: 0 16px 0 {{ p.pad }}px; background: var(--surface); border-bottom: 1px solid var(--border); border-right: 2px solid var(--border-strong); white-space: nowrap">
+                      <input value="{{ p.label }}" onChange="{{ p.renameLabel }}" style="width: 100%; border: 0; background: transparent; color: var(--fg); font-weight: {{ p.weight }}; font-style: {{ p.italic }}; font-size: 12.5px; {{ p.fontStyle }}" />
+                    </td>
+                    <td style="height: {{ p.rowHeight }}; padding: 0; border-bottom: 1px solid var(--border); position: relative; text-align: center">
+                      <div style="display: flex; align-items: center; justify-content: center; gap: 4px">
+                        <button onClick="{{ p.toggleColor }}" title="Cor da linha" style="width: 16px; height: 16px; border-radius: 4px; border: 1px solid var(--border-strong); background: {{ p.swatchBg }}; cursor: pointer; padding: 0"></button>
+                        <button onClick="{{ p.toggleFormat }}" title="Fonte e altura da linha" style="width: 16px; height: 16px; border-radius: 4px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg-muted); font-size: 9px; font-weight: 700; cursor: pointer; padding: 0">Aa</button>
+                      </div>
+                      <sc-if value="{{ p.colorOpen }}" hint-placeholder-val="{{ false }}">
+                        <div style="{{ p.colorPopStyle }} padding: 6px; display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow-pop)">
+                          <sc-for list="{{ p.colorOptions }}" as="opt" hint-placeholder-count="6">
+                            <button onClick="{{ opt.pick }}" title="Cor" style="width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--border-strong); background: {{ opt.swatch }}; cursor: pointer; padding: 0"></button>
+                          </sc-for>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ p.formatOpen }}" hint-placeholder-val="{{ false }}">
+                        <div style="{{ p.formatPopStyle }} padding: 10px; width: 200px; text-align: left; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow-pop)">
+                          <div style="font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 4px">Fonte</div>
+                          <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px">
+                            <sc-for list="{{ p.fontOptions }}" as="opt" hint-placeholder-count="6">
+                              <button onClick="{{ opt.pick }}" style="padding: 3px 7px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg); font-size: 10.5px" style-hover="border-color: var(--brand-primary)">{{ opt.label }}</button>
+                            </sc-for>
+                          </div>
+                          <div style="font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 4px">Tamanho</div>
+                          <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px">
+                            <sc-for list="{{ p.sizeOptions }}" as="opt" hint-placeholder-count="9">
+                              <button onClick="{{ opt.pick }}" style="padding: 3px 7px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg); font-size: 10.5px" style-hover="border-color: var(--brand-primary)">{{ opt.label }}</button>
+                            </sc-for>
+                          </div>
+                          <div style="font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 4px">Altura da linha</div>
+                          <div style="display: flex; flex-direction: column; gap: 2px">
+                            <sc-for list="{{ p.heightOptions }}" as="opt" hint-placeholder-count="5">
+                              <button onClick="{{ opt.pick }}" style="padding: 4px 8px; border-radius: 4px; border: 0; background: transparent; color: var(--fg); font-size: 11px; text-align: left" style-hover="background: var(--surface-hover)">{{ opt.label }}</button>
+                            </sc-for>
+                          </div>
+                        </div>
+                      </sc-if>
                     </td>
                     <sc-for list="{{ p.cells }}" as="c" hint-placeholder-count="12">
-                      <td style="height: var(--row-h); padding: 0; border-bottom: 1px solid var(--border); background: {{ p.bg }}; min-width: 92px">
-                        <input value="{{ c.value }}" onChange="{{ c.edit }}" style="box-sizing: border-box; width: 100%; border: 0; background: transparent; padding: 0 14px; text-align: right; font-variant-numeric: tabular-nums; font-weight: {{ p.weight }}; color: var(--fg); font-size: 12.5px" />
+                      <td style="height: {{ p.rowHeight }}; padding: 0; border-bottom: 1px solid var(--border); background: {{ c.bg }}; min-width: {{ c.colWidth }}; position: relative">
+                        <input value="{{ c.value }}" onChange="{{ c.edit }}" style="box-sizing: border-box; width: 100%; border: 0; background: transparent; padding: 0 14px; text-align: right; font-variant-numeric: tabular-nums; font-weight: {{ p.weight }}; color: var(--fg); font-size: 12.5px; {{ c.fontStyle }}" />
+                        <button onClick="{{ c.toggle }}" title="Formatar célula" style="position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; padding: 0; border-radius: 50%; border: 1.5px solid var(--border-strong); background: {{ c.swatchBg }}; opacity: .6; cursor: pointer" style-hover="opacity: 1; border-color: var(--brand-primary)"></button>
+                        <sc-if value="{{ c.open }}" hint-placeholder-val="{{ false }}">
+                          <div style="{{ c.popStyle }} padding: 10px; width: 190px; text-align: left; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow-pop)">
+                            <div style="font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 4px">Cor da célula</div>
+                            <div style="display: flex; gap: 4px; margin-bottom: 8px">
+                              <sc-for list="{{ c.colorOptions }}" as="opt" hint-placeholder-count="6">
+                                <button onClick="{{ opt.pick }}" title="Cor" style="width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--border-strong); background: {{ opt.swatch }}; cursor: pointer; padding: 0"></button>
+                              </sc-for>
+                            </div>
+                            <div style="font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 4px">Fonte</div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px">
+                              <sc-for list="{{ c.fontOptions }}" as="opt" hint-placeholder-count="6">
+                                <button onClick="{{ opt.pick }}" style="padding: 3px 7px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg); font-size: 10.5px" style-hover="border-color: var(--brand-primary)">{{ opt.label }}</button>
+                              </sc-for>
+                            </div>
+                            <div style="font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 4px">Tamanho</div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 4px">
+                              <sc-for list="{{ c.sizeOptions }}" as="opt" hint-placeholder-count="9">
+                                <button onClick="{{ opt.pick }}" style="padding: 3px 7px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg); font-size: 10.5px" style-hover="border-color: var(--brand-primary)">{{ opt.label }}</button>
+                              </sc-for>
+                            </div>
+                          </div>
+                        </sc-if>
                       </td>
                     </sc-for>
-                    <td style="height: var(--row-h); padding: 0; border-bottom: 1px solid var(--border); background: var(--surface-3); min-width: 104px">
-                      <input value="{{ p.total }}" onChange="{{ p.editTotal }}" style="box-sizing: border-box; width: 100%; border: 0; background: transparent; padding: 0 16px; text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; color: var(--fg); font-size: 12.5px" />
+                    <td style="height: {{ p.rowHeight }}; border-bottom: 1px solid var(--border); background: {{ p.bg }}"></td>
+                    <td style="height: {{ p.rowHeight }}; padding: 0; border-bottom: 1px solid var(--border); background: var(--surface-3); min-width: 104px">
+                      <input value="{{ p.total }}" onChange="{{ p.editTotal }}" style="box-sizing: border-box; width: 100%; border: 0; background: transparent; padding: 0 16px; text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; color: var(--fg); font-size: 12.5px; {{ p.fontStyle }}" />
                     </td>
-                    <td style="height: var(--row-h); padding: 0; border-bottom: 1px solid var(--border); text-align: center">
+                    <td style="height: {{ p.rowHeight }}; padding: 0; border-bottom: 1px solid var(--border); text-align: center">
                       <button onClick="{{ p.remove }}" title="Remover linha" style="display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; border: 0; background: transparent; color: var(--status-err)">
                         <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor"><path d="M6 6l12 12M18 6 6 18" stroke-width="2" stroke-linecap="round"></path></svg>
                       </button>
@@ -1313,32 +1412,105 @@ a:hover { color: var(--brand-primary-hover); text-decoration: underline; }
     </sc-if>
 
     <sc-if value="{{ activeCustomTab.kind === 'custom' }}" hint-placeholder-val="{{ false }}">
-      <div data-screen-label="Aba customizada" style="padding: var(--pad-screen); max-width: 1200px">
+      <div data-screen-label="Aba customizada" style="padding: var(--pad-screen); max-width: {{ screenMaxWidth1200 }}">
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 18px">
           <input value="{{ activeCustomTab.name }}" onChange="{{ activeCustomTab.rename }}" style="font-size: 22px; font-weight: 600; letter-spacing: -.01em; border: 1px solid transparent; border-radius: var(--radius-sm); padding: 4px 8px; margin-left: -9px; background: transparent; color: var(--fg); flex: 1; min-width: 0" style-hover="border-color: var(--border-strong); background: var(--surface)" />
+          <button onClick="{{ toggleFullscreen }}" title="{{ fullscreenLabel }}" style="display: inline-flex; align-items: center; justify-content: center; width: var(--row-h); height: var(--row-h); padding: 0; border-radius: var(--radius); border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg); flex: none" style-hover="background: var(--surface-hover)">
+            <sc-if value="{{ fullscreenOn }}" hint-placeholder-val="{{ false }}">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"><path d="M9 3v4a2 2 0 0 1-2 2H3M15 3v4a2 2 0 0 0 2 2h4M3 15h4a2 2 0 0 1 2 2v4M21 15h-4a2 2 0 0 0-2 2v4" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            </sc-if>
+            <sc-if value="{{ !fullscreenOn }}" hint-placeholder-val="{{ true }}">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m9 0h3a2 2 0 0 0 2-2v-3" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            </sc-if>
+          </button>
           <button onClick="{{ activeCustomTab.addRow }}" style="height: var(--row-h); padding: 0 14px; border-radius: var(--radius); border: 1px solid var(--brand-primary); background: var(--brand-primary); color: #fff; font-size: 13px; font-weight: 600; flex: none" style-hover="background: var(--brand-primary-hover)">+ Nova linha</button>
         </div>
 
         <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden">
           <div style="overflow-x: auto">
             <div style="display: grid; grid-template-columns: {{ activeCustomTab.gridTemplate }}; background: var(--brand-primary)">
+              <div style="border-right: 1px solid rgba(255,255,255,.2)"></div>
               <sc-for list="{{ activeCustomTab.columns }}" as="col" hint-placeholder-count="2">
-                <div style="display: flex; align-items: center; gap: 4px; padding: 8px; border-right: 1px solid rgba(255,255,255,.2)">
+                <div style="display: flex; align-items: center; gap: 4px; padding: 8px; border-right: 1px solid rgba(255,255,255,.2); position: relative">
                   <input value="{{ col.value }}" onChange="{{ col.rename }}" style="flex: 1; min-width: 0; border: 0; background: transparent; color: #fff; font-size: 11px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase" />
-                  <button onClick="{{ col.remove }}" title="Remover coluna" style="display: grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; border: 0; background: rgba(255,255,255,.15); color: #fff; flex: none">
-                    <svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor"><path d="M6 6l12 12M18 6 6 18" stroke-width="2.4" stroke-linecap="round"></path></svg>
+                  <button onClick="{{ col.toggleWidth }}" title="Largura da coluna" style="display: grid; place-items: center; width: 16px; height: 16px; padding: 0; border-radius: 50%; border: 0; background: transparent; color: #fff; flex: none; font-size: 11px" style-hover="background: rgba(255,255,255,.28)">↔</button>
+                  <button onClick="{{ col.remove }}" title="Remover coluna" style="display: grid; place-items: center; width: 16px; height: 16px; padding: 0; border-radius: 50%; border: 0; background: transparent; color: #fff; flex: none" style-hover="background: rgba(255,255,255,.28)">
+                    <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" style="display: block"><path d="M6 6l12 12M18 6 6 18" stroke-width="2.6" stroke-linecap="round"></path></svg>
                   </button>
+                  <sc-if value="{{ col.widthOpen }}" hint-placeholder-val="{{ false }}">
+                    <div style="{{ col.widthPopStyle }} padding: 6px; width: 140px; display: flex; flex-direction: column; gap: 2px; text-align: left; text-transform: none; letter-spacing: normal; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow-pop)">
+                      <sc-for list="{{ col.widthOptions }}" as="opt" hint-placeholder-count="5">
+                        <button onClick="{{ opt.pick }}" style="padding: 4px 8px; border-radius: 4px; border: 0; background: transparent; color: var(--fg); font-size: 11px; text-align: left" style-hover="background: var(--surface-hover)">{{ opt.label }}</button>
+                      </sc-for>
+                    </div>
+                  </sc-if>
                 </div>
               </sc-for>
-              <button onClick="{{ activeCustomTab.addColumn }}" title="Adicionar coluna" style="display: grid; place-items: center; border: 0; border-left: 1px dashed rgba(255,255,255,.4); background: transparent; color: #fff; font-size: 15px; font-weight: 700">+</button>
+              <button onClick="{{ activeCustomTab.addColumn }}" title="Adicionar coluna" style="display: grid; place-items: center; padding: 0; border: 0; border-left: 1px dashed rgba(255,255,255,.4); background: transparent; color: #fff; font-size: 15px; font-weight: 700">+</button>
             </div>
 
             <sc-if value="{{ activeCustomTab.rows.length }}" hint-placeholder-val="{{ false }}">
               <sc-for list="{{ activeCustomTab.rows }}" as="row" hint-placeholder-count="0">
-                <div style="display: grid; grid-template-columns: {{ activeCustomTab.gridTemplate }}; border-bottom: 1px solid var(--border)">
+                <div style="display: grid; grid-template-columns: {{ activeCustomTab.gridTemplate }}; border-bottom: 1px solid var(--border); background: {{ row.bg }}; height: {{ row.rowHeight }}">
+                  <div style="border-right: 1px solid var(--border); position: relative; display: flex; align-items: center; justify-content: center; gap: 4px">
+                    <button onClick="{{ row.toggleColor }}" title="Cor da linha" style="width: 16px; height: 16px; border-radius: 4px; border: 1px solid var(--border-strong); background: {{ row.bg }}; cursor: pointer; padding: 0"></button>
+                    <button onClick="{{ row.toggleFormat }}" title="Fonte e altura da linha" style="width: 16px; height: 16px; border-radius: 4px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg-muted); font-size: 9px; font-weight: 700; cursor: pointer; padding: 0">Aa</button>
+                    <sc-if value="{{ row.colorOpen }}" hint-placeholder-val="{{ false }}">
+                      <div style="{{ row.colorPopStyle }} padding: 6px; display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow-pop)">
+                        <sc-for list="{{ row.colorOptions }}" as="opt" hint-placeholder-count="6">
+                          <button onClick="{{ opt.pick }}" title="Cor" style="width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--border-strong); background: {{ opt.swatch }}; cursor: pointer; padding: 0"></button>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ row.formatOpen }}" hint-placeholder-val="{{ false }}">
+                      <div style="{{ row.formatPopStyle }} padding: 10px; width: 200px; text-align: left; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow-pop)">
+                        <div style="font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 4px">Fonte</div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px">
+                          <sc-for list="{{ row.fontOptions }}" as="opt" hint-placeholder-count="6">
+                            <button onClick="{{ opt.pick }}" style="padding: 3px 7px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg); font-size: 10.5px" style-hover="border-color: var(--brand-primary)">{{ opt.label }}</button>
+                          </sc-for>
+                        </div>
+                        <div style="font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 4px">Tamanho</div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px">
+                          <sc-for list="{{ row.sizeOptions }}" as="opt" hint-placeholder-count="9">
+                            <button onClick="{{ opt.pick }}" style="padding: 3px 7px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg); font-size: 10.5px" style-hover="border-color: var(--brand-primary)">{{ opt.label }}</button>
+                          </sc-for>
+                        </div>
+                        <div style="font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 4px">Altura da linha</div>
+                        <div style="display: flex; flex-direction: column; gap: 2px">
+                          <sc-for list="{{ row.heightOptions }}" as="opt" hint-placeholder-count="5">
+                            <button onClick="{{ opt.pick }}" style="padding: 4px 8px; border-radius: 4px; border: 0; background: transparent; color: var(--fg); font-size: 11px; text-align: left" style-hover="background: var(--surface-hover)">{{ opt.label }}</button>
+                          </sc-for>
+                        </div>
+                      </div>
+                    </sc-if>
+                  </div>
                   <sc-for list="{{ row.cells }}" as="cell" hint-placeholder-count="2">
-                    <div style="border-right: 1px solid var(--border)">
-                      <input value="{{ cell.value }}" onChange="{{ cell.edit }}" style="width: 100%; border: 0; background: transparent; padding: 7px 8px; font-size: 12.5px; color: var(--fg)" />
+                    <div style="border-right: 1px solid var(--border); background: {{ cell.bg }}; position: relative">
+                      <input value="{{ cell.value }}" onChange="{{ cell.edit }}" style="width: 100%; border: 0; background: transparent; padding: 7px 8px; font-size: 12.5px; color: var(--fg); {{ cell.fontStyle }}" />
+                      <button onClick="{{ cell.toggle }}" title="Formatar célula" style="position: absolute; top: 2px; right: 2px; width: 12px; height: 12px; padding: 0; border-radius: 50%; border: 1.5px solid var(--border-strong); background: {{ cell.swatchBg }}; opacity: .6; cursor: pointer" style-hover="opacity: 1; border-color: var(--brand-primary)"></button>
+                      <sc-if value="{{ cell.open }}" hint-placeholder-val="{{ false }}">
+                        <div style="{{ cell.popStyle }} padding: 10px; width: 190px; text-align: left; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow-pop)">
+                          <div style="font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 4px">Cor da célula</div>
+                          <div style="display: flex; gap: 4px; margin-bottom: 8px">
+                            <sc-for list="{{ cell.colorOptions }}" as="opt" hint-placeholder-count="6">
+                              <button onClick="{{ opt.pick }}" title="Cor" style="width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--border-strong); background: {{ opt.swatch }}; cursor: pointer; padding: 0"></button>
+                            </sc-for>
+                          </div>
+                          <div style="font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 4px">Fonte</div>
+                          <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px">
+                            <sc-for list="{{ cell.fontOptions }}" as="opt" hint-placeholder-count="6">
+                              <button onClick="{{ opt.pick }}" style="padding: 3px 7px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg); font-size: 10.5px" style-hover="border-color: var(--brand-primary)">{{ opt.label }}</button>
+                            </sc-for>
+                          </div>
+                          <div style="font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 4px">Tamanho</div>
+                          <div style="display: flex; flex-wrap: wrap; gap: 4px">
+                            <sc-for list="{{ cell.sizeOptions }}" as="opt" hint-placeholder-count="9">
+                              <button onClick="{{ opt.pick }}" style="padding: 3px 7px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg); font-size: 10.5px" style-hover="border-color: var(--brand-primary)">{{ opt.label }}</button>
+                            </sc-for>
+                          </div>
+                        </div>
+                      </sc-if>
                     </div>
                   </sc-for>
                   <button onClick="{{ row.remove }}" title="Remover linha" style="display: grid; place-items: center; border: 0; background: transparent; color: var(--status-err)">
@@ -1357,12 +1529,22 @@ a:hover { color: var(--brand-primary-hover); text-decoration: underline; }
     </sc-if>
 
     <sc-if value="{{ activeCustomTab.kind === 'front' }}" hint-placeholder-val="{{ false }}">
-      <div data-screen-label="Front importado" style="padding: var(--pad-screen); max-width: 1400px">
+      <div data-screen-label="Front importado" style="padding: var(--pad-screen); max-width: {{ screenMaxWidth1400 }}">
         <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 20px; margin-bottom: 4px; flex-wrap: wrap">
           <h1 style="margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -.01em">{{ activeCustomTab.name }}</h1>
-          <div style="font-size: 12px; color: var(--fg-muted)">{{ activeCustomTab.fileLabel }} · aba "{{ activeCustomTab.sheetName }}"</div>
+          <div style="display: flex; align-items: center; gap: 12px; align-self: center">
+            <div style="font-size: 12px; color: var(--fg-muted)">{{ activeCustomTab.fileLabel }} · aba "{{ activeCustomTab.sheetName }}"</div>
+            <button onClick="{{ toggleFullscreen }}" title="{{ fullscreenLabel }}" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg); flex: none" style-hover="background: var(--surface-hover)">
+              <sc-if value="{{ fullscreenOn }}" hint-placeholder-val="{{ false }}">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"><path d="M9 3v4a2 2 0 0 1-2 2H3M15 3v4a2 2 0 0 0 2 2h4M3 15h4a2 2 0 0 1 2 2v4M21 15h-4a2 2 0 0 0-2 2v4" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              </sc-if>
+              <sc-if value="{{ !fullscreenOn }}" hint-placeholder-val="{{ true }}">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m9 0h3a2 2 0 0 0 2-2v-3" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              </sc-if>
+            </button>
+          </div>
         </div>
-        <p style="margin: 0 0 16px; font-size: 12px; color: var(--fg-faint)">{{ activeCustomTab.totalRows }} linha(s) × {{ activeCustomTab.totalCols }} coluna(s) na aba original · somente leitura — para editar, use o arquivo gerado</p>
+        <p style="margin: 0 0 16px; font-size: 12px; color: var(--fg-faint)">{{ activeCustomTab.totalRows }} linha(s) × {{ activeCustomTab.totalCols }} coluna(s) na aba original · edite direto na célula e clique em "Salvar alterações" para gravar no arquivo</p>
 
         <sc-if value="{{ activeCustomTab.error }}" hint-placeholder-val="{{ false }}">
           <div style="padding: 12px 16px; border: 1px solid var(--status-err); border-radius: var(--radius); background: color-mix(in oklab, var(--status-err) 10%, transparent); color: var(--status-err); font-size: 12.5px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px">
@@ -1380,17 +1562,102 @@ a:hover { color: var(--brand-primary-hover); text-decoration: underline; }
             <div style="overflow-x: auto">
               <div style="display: grid; grid-template-columns: {{ activeCustomTab.gridTemplate }}; background: var(--surface-2); border-bottom: 1px solid var(--border); position: sticky; top: 0">
                 <div style="padding: 6px 8px; font-size: 10.5px; font-weight: 700; color: var(--fg-faint); border-right: 1px solid var(--border)"></div>
+                <div style="border-right: 1px solid var(--border)"></div>
                 <sc-for list="{{ activeCustomTab.colLetters }}" as="letter" hint-placeholder-count="6">
-                  <div style="padding: 6px 8px; font-size: 10.5px; font-weight: 700; letter-spacing: .03em; color: var(--fg-faint); border-right: 1px solid var(--border); font-family: 'Cascadia Mono', Consolas, ui-monospace, monospace">{{ letter }}</div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; padding: 6px 8px; border-right: 1px solid var(--border); position: relative">
+                    <span style="font-size: 10.5px; font-weight: 700; letter-spacing: .03em; color: var(--fg-faint); font-family: 'Cascadia Mono', Consolas, ui-monospace, monospace">{{ letter.letter }}</span>
+                    <div style="display: flex; align-items: center; gap: 2px; flex: none">
+                      <button onClick="{{ letter.toggleWidth }}" title="Largura da coluna" style="display: grid; place-items: center; width: 16px; height: 16px; padding: 0; border-radius: 50%; border: 0; background: transparent; color: var(--fg-faint); flex: none; font-size: 10px" style-hover="background: var(--surface-hover)">↔</button>
+                      <button onClick="{{ letter.toggleConfirm }}" title="Remover coluna" style="display: grid; place-items: center; width: 16px; height: 16px; padding: 0; border-radius: 50%; border: 0; background: transparent; color: var(--fg-faint); flex: none" style-hover="background: color-mix(in oklab, var(--status-err) 15%, transparent); color: var(--status-err)">
+                        <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" style="display: block"><path d="M6 6l12 12M18 6 6 18" stroke-width="2.6" stroke-linecap="round"></path></svg>
+                      </button>
+                    </div>
+                    <sc-if value="{{ letter.confirmOpen }}" hint-placeholder-val="{{ false }}">
+                      <div style="{{ letter.confirmPopStyle }} padding: 10px; width: 190px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow-pop); text-align: left; text-transform: none; letter-spacing: normal">
+                        <div style="font-size: 11.5px; color: var(--fg); margin-bottom: 8px; line-height: 1.4">Remover coluna {{ letter.letter }} de todas as {{ activeCustomTab.totalRows }} linhas da aba? Isso altera o arquivo.</div>
+                        <div style="display: flex; gap: 6px; justify-content: flex-end">
+                          <button onClick="{{ letter.toggleConfirm }}" style="height: 24px; padding: 0 8px; border-radius: 4px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg); font-size: 11px; font-weight: 600">Cancelar</button>
+                          <button onClick="{{ letter.confirmDelete }}" style="height: 24px; padding: 0 8px; border-radius: 4px; border: 1px solid var(--status-err); background: var(--status-err); color: #fff; font-size: 11px; font-weight: 600">Remover</button>
+                        </div>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ letter.widthOpen }}" hint-placeholder-val="{{ false }}">
+                      <div style="{{ letter.widthPopStyle }} padding: 6px; width: 140px; display: flex; flex-direction: column; gap: 2px; text-align: left; text-transform: none; letter-spacing: normal; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow-pop)">
+                        <sc-for list="{{ letter.widthOptions }}" as="opt" hint-placeholder-count="5">
+                          <button onClick="{{ opt.pick }}" style="padding: 4px 8px; border-radius: 4px; border: 0; background: transparent; color: var(--fg); font-size: 11px; text-align: left" style-hover="background: var(--surface-hover)">{{ opt.label }}</button>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+                  </div>
                 </sc-for>
+                <button onClick="{{ activeCustomTab.addColumn }}" title="Adicionar coluna" style="display: grid; place-items: center; padding: 0; border: 0; border-left: 1px dashed var(--border-strong); background: transparent; color: var(--fg-muted); font-size: 14px; font-weight: 700" style-hover="color: var(--brand-primary); background: var(--surface-hover)">+</button>
               </div>
               <sc-if value="{{ activeCustomTab.hasRows }}" hint-placeholder-val="{{ false }}">
                 <sc-for list="{{ activeCustomTab.displayRows }}" as="row" hint-placeholder-count="6">
-                  <div style="display: grid; grid-template-columns: {{ activeCustomTab.gridTemplate }}; border-bottom: 1px solid var(--border)">
+                  <div style="display: grid; grid-template-columns: {{ activeCustomTab.gridTemplate }}; border-bottom: 1px solid var(--border); background: {{ row.bg }}; height: {{ row.rowHeight }}">
                     <div style="padding: 6px 8px; font-size: 11px; color: var(--fg-faint); background: var(--surface-2); border-right: 1px solid var(--border); font-family: 'Cascadia Mono', Consolas, ui-monospace, monospace; text-align: right">{{ row.num }}</div>
+                    <div style="border-right: 1px solid var(--border); position: relative; display: flex; align-items: center; justify-content: center; gap: 4px">
+                      <button onClick="{{ row.toggleColor }}" title="Cor da linha" style="width: 16px; height: 16px; border-radius: 4px; border: 1px solid var(--border-strong); background: {{ row.bg }}; cursor: pointer; padding: 0"></button>
+                      <button onClick="{{ row.toggleFormat }}" title="Fonte e altura da linha" style="width: 16px; height: 16px; border-radius: 4px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg-muted); font-size: 9px; font-weight: 700; cursor: pointer; padding: 0">Aa</button>
+                      <sc-if value="{{ row.colorOpen }}" hint-placeholder-val="{{ false }}">
+                        <div style="{{ row.colorPopStyle }} padding: 6px; display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow-pop)">
+                          <sc-for list="{{ row.colorOptions }}" as="opt" hint-placeholder-count="6">
+                            <button onClick="{{ opt.pick }}" title="Cor" style="width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--border-strong); background: {{ opt.swatch }}; cursor: pointer; padding: 0"></button>
+                          </sc-for>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ row.formatOpen }}" hint-placeholder-val="{{ false }}">
+                        <div style="{{ row.formatPopStyle }} padding: 10px; width: 200px; text-align: left; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow-pop)">
+                          <div style="font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 4px">Fonte</div>
+                          <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px">
+                            <sc-for list="{{ row.fontOptions }}" as="opt" hint-placeholder-count="6">
+                              <button onClick="{{ opt.pick }}" style="padding: 3px 7px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg); font-size: 10.5px" style-hover="border-color: var(--brand-primary)">{{ opt.label }}</button>
+                            </sc-for>
+                          </div>
+                          <div style="font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 4px">Tamanho</div>
+                          <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px">
+                            <sc-for list="{{ row.sizeOptions }}" as="opt" hint-placeholder-count="9">
+                              <button onClick="{{ opt.pick }}" style="padding: 3px 7px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg); font-size: 10.5px" style-hover="border-color: var(--brand-primary)">{{ opt.label }}</button>
+                            </sc-for>
+                          </div>
+                          <div style="font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 4px">Altura da linha</div>
+                          <div style="display: flex; flex-direction: column; gap: 2px">
+                            <sc-for list="{{ row.heightOptions }}" as="opt" hint-placeholder-count="5">
+                              <button onClick="{{ opt.pick }}" style="padding: 4px 8px; border-radius: 4px; border: 0; background: transparent; color: var(--fg); font-size: 11px; text-align: left" style-hover="background: var(--surface-hover)">{{ opt.label }}</button>
+                            </sc-for>
+                          </div>
+                        </div>
+                      </sc-if>
+                    </div>
                     <sc-for list="{{ row.cells }}" as="cell" hint-placeholder-count="6">
-                      <div style="padding: 6px 8px; font-size: 12px; color: var(--fg); border-right: 1px solid var(--border); overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ cell }}</div>
+                      <div style="border-right: 1px solid var(--border); background: {{ cell.bg }}; position: relative">
+                        <input value="{{ cell.value }}" onChange="{{ cell.edit }}" style="box-sizing: border-box; width: 100%; border: 0; background: transparent; padding: 6px 8px; font-size: 12px; color: var(--fg); {{ cell.fontStyle }}" />
+                        <button onClick="{{ cell.toggle }}" title="Formatar célula" style="position: absolute; top: 2px; right: 2px; width: 12px; height: 12px; padding: 0; border-radius: 50%; border: 1.5px solid var(--border-strong); background: {{ cell.swatchBg }}; opacity: .6; cursor: pointer" style-hover="opacity: 1; border-color: var(--brand-primary)"></button>
+                        <sc-if value="{{ cell.open }}" hint-placeholder-val="{{ false }}">
+                          <div style="{{ cell.popStyle }} padding: 10px; width: 190px; text-align: left; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow-pop)">
+                            <div style="font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 4px">Cor da célula</div>
+                            <div style="display: flex; gap: 4px; margin-bottom: 8px">
+                              <sc-for list="{{ cell.colorOptions }}" as="opt" hint-placeholder-count="6">
+                                <button onClick="{{ opt.pick }}" title="Cor" style="width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--border-strong); background: {{ opt.swatch }}; cursor: pointer; padding: 0"></button>
+                              </sc-for>
+                            </div>
+                            <div style="font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 4px">Fonte</div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px">
+                              <sc-for list="{{ cell.fontOptions }}" as="opt" hint-placeholder-count="6">
+                                <button onClick="{{ opt.pick }}" style="padding: 3px 7px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg); font-size: 10.5px" style-hover="border-color: var(--brand-primary)">{{ opt.label }}</button>
+                              </sc-for>
+                            </div>
+                            <div style="font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 4px">Tamanho</div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 4px">
+                              <sc-for list="{{ cell.sizeOptions }}" as="opt" hint-placeholder-count="9">
+                                <button onClick="{{ opt.pick }}" style="padding: 3px 7px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg); font-size: 10.5px" style-hover="border-color: var(--brand-primary)">{{ opt.label }}</button>
+                              </sc-for>
+                            </div>
+                          </div>
+                        </sc-if>
+                      </div>
                     </sc-for>
+                    <div></div>
                   </div>
                 </sc-for>
               </sc-if>
@@ -1401,7 +1668,11 @@ a:hover { color: var(--brand-primary-hover); text-decoration: underline; }
           </div>
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px">
             <div style="font-size: 11.5px; color: var(--fg-faint)">Linhas {{ activeCustomTab.pageStart }}–{{ activeCustomTab.pageEnd }} de {{ activeCustomTab.totalRows }}</div>
-            <div style="display: flex; gap: 8px">
+            <div style="display: flex; align-items: center; gap: 8px">
+              <sc-if value="{{ activeCustomTab.dirty }}" hint-placeholder-val="{{ false }}">
+                <span style="font-size: 11px; color: var(--status-warn); font-weight: 600">alterações não salvas</span>
+              </sc-if>
+              <button onClick="{{ activeCustomTab.saveEdits }}" disabled="{{ !activeCustomTab.dirty }}" style="height: 30px; padding: 0 14px; border-radius: var(--radius-sm); border: 1px solid var(--brand-primary); background: var(--brand-primary); color: #fff; font-size: 12px; font-weight: 700; opacity: {{ activeCustomTab.saveOpacity }}" style-hover="background: var(--brand-primary-hover)">{{ activeCustomTab.saveLabel }}</button>
               <button onClick="{{ activeCustomTab.prevPage }}" disabled="{{ !activeCustomTab.canPrev }}" style="height: 30px; padding: 0 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg); font-size: 12px; font-weight: 600; opacity: {{ activeCustomTab.prevOpacity }}" style-hover="background: var(--surface-hover)">← Anterior</button>
               <button onClick="{{ activeCustomTab.nextPage }}" disabled="{{ !activeCustomTab.canNext }}" style="height: 30px; padding: 0 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg); font-size: 12px; font-weight: 600; opacity: {{ activeCustomTab.nextOpacity }}" style-hover="background: var(--surface-hover)">Próxima →</button>
             </div>
@@ -1412,7 +1683,7 @@ a:hover { color: var(--brand-primary-hover); text-decoration: underline; }
 
   </main>
 
-  <footer style="grid-column: 2; grid-row: 2; background: var(--footer-bg); color: var(--footer-fg); display: flex; align-items: center; justify-content: space-between; padding: 0 var(--pad-screen); font-size: 12px">
+  <footer style="grid-column: {{ mainCol }}; grid-row: 2; background: var(--footer-bg); color: var(--footer-fg); display: flex; align-items: center; justify-content: space-between; padding: 0 var(--pad-screen); font-size: 12px">
     <div style="display: flex; align-items: center; gap: 12px">
       <span style="width: 22px; height: 22px; background: var(--brand-accent); border-radius: 4px; display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 11px; letter-spacing: -.04em">TIM</span>
       <div style="line-height: 1.35">
@@ -2058,6 +2329,7 @@ a:hover { color: var(--brand-primary-hover); text-decoration: underline; }
 class Component extends DCLogic {
   state = {
     screen: "home",
+    fullscreen: false,
     customTabs: [],
     theme: this.props.theme ?? "light",
     density: this.props.density ?? "comfy",
@@ -2115,6 +2387,9 @@ class Component extends DCLogic {
       linhaBd: "232 · 246 · 247", ifrs: "w/o IFRS",
     },
     resultsFilterOpen: null,
+    popover: null,
+    resultsColumnWidths: [],
+    resultsColumns: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"],
     resultsRows: [
       ["Net Revenues", 0, "total", 4182300],
       ["Service Revenues", 1, "sub", 3914800],
@@ -2140,9 +2415,10 @@ class Component extends DCLogic {
       ["Serv. Fixed", 2, "sub", 394700],
       ["Product Revenues", 1, "sub", 267500],
     ].map(([label, level, kind, base], idx) => ({
-      id: "pr" + idx, label, level, kind,
+      id: "pr" + idx, label, level, kind, color: null, fontFamily: null, fontSize: null, height: null,
       cells: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(j =>
         Math.round(base / 12 * (1 + (j % 5) * 0.03)).toLocaleString("pt-BR")),
+      cellFormats: {},
       total: base.toLocaleString("pt-BR"),
     })),
     selUser: null,
@@ -2229,6 +2505,31 @@ class Component extends DCLogic {
     "ACT > Pré-Closing", "ACT > AJ_Pré-Closing",
   ];
 
+  // Paleta de cor de linha no visualizador de Front — null = sem cor
+  // (limpa o destaque). Gravado de verdade como preenchimento da célula
+  // no Excel (apply_sheet_edits), não é só cosmético na tela.
+  ROW_COLOR_OPTIONS = [null, "FFF9C4", "FFCDD2", "C8E6C9", "BBDEFB", "E1BEE7"];
+
+  // Formatação por linha/coluna (Nova Aba, Main Results e Front
+  // importado usam as mesmas listas) — presets em vez de campo livre,
+  // pra não precisar de um resize por arraste.
+  FONT_OPTIONS = [null, "Segoe UI", "Arial", "Georgia", "Cascadia Mono", "Times New Roman"];
+  FONT_SIZE_OPTIONS = [null, 11, 12, 13, 14, 16, 18, 20, 24];
+  ROW_HEIGHT_OPTIONS = [
+    { label: "Padrão", value: null },
+    { label: "Compacta · 28px", value: 28 },
+    { label: "Normal · 36px", value: 36 },
+    { label: "Confortável · 44px", value: 44 },
+    { label: "Alta · 56px", value: 56 },
+  ];
+  COLUMN_WIDTH_OPTIONS = [
+    { label: "Padrão", value: null },
+    { label: "Estreita · 70px", value: 70 },
+    { label: "Normal · 120px", value: 120 },
+    { label: "Larga · 180px", value: 180 },
+    { label: "Muito larga · 260px", value: 260 },
+  ];
+
   // Quais campos cada fonte pede antes de extrair, validado contra o VBA
   // original (cada Extracao_Base_*.bas lê um conjunto de células
   // diferente — ver docs/tech/A_12_catalogo_regras_negocio.md). "HUBBLE"
@@ -2257,7 +2558,7 @@ class Component extends DCLogic {
         // ela é relida do arquivo (get_sheet_data) na hora em que a aba
         // é aberta, pra nunca mostrar dado desatualizado.
         const customTabs = saved.map(t => t.kind === "front"
-          ? { ...t, pageRows: null, pageStart: 1, pageSize: 40, loading: false, error: null }
+          ? { ...t, pageRows: null, pageStart: 1, pageSize: 40, loading: false, error: null, pendingEdits: {}, saving: false, rowColors: t.rowColors || {}, rowFormats: t.rowFormats || {}, columnWidths: t.columnWidths || {}, cellFormats: t.cellFormats || {} }
           : t);
         this.setState({ customTabs });
       }
@@ -2267,7 +2568,7 @@ class Component extends DCLogic {
   saveCustomTabs = () => {
     try {
       const slim = this.state.customTabs.map(t => t.kind === "front"
-        ? { id: t.id, kind: "front", name: t.name, filePath: t.filePath, sheetName: t.sheetName, totalRows: t.totalRows, totalCols: t.totalCols }
+        ? { id: t.id, kind: "front", name: t.name, filePath: t.filePath, sheetName: t.sheetName, totalRows: t.totalRows, totalCols: t.totalCols, rowColors: t.rowColors || {}, rowFormats: t.rowFormats || {}, columnWidths: t.columnWidths || {}, cellFormats: t.cellFormats || {} }
         : t);
       localStorage.setItem("qd_custom_tabs", JSON.stringify(slim));
     } catch (e) { /* localStorage indisponível */ }
@@ -2343,6 +2644,180 @@ class Component extends DCLogic {
     }), this.saveCustomTabs);
   };
 
+  // Editar célula de um Front importado — muda na hora na tela (pra
+  // parecer instantâneo) e marca como pendente; só grava de verdade no
+  // arquivo quando o usuário clica "Salvar alterações" (senão seria uma
+  // escrita em disco a cada tecla digitada, em arquivos que podem ter
+  // centenas de colunas).
+  editFrontCell = (id, rowIdx, colIdx) => (e) => {
+    const value = e.target.value;
+    this.setState(s => ({
+      customTabs: s.customTabs.map(t => {
+        if (t.id !== id) return t;
+        const pageRows = t.pageRows.map((r, ri) => (ri === rowIdx ? r.map((c, ci) => (ci === colIdx ? value : c)) : r));
+        return { ...t, pageRows, pendingEdits: { ...t.pendingEdits, [rowIdx + "," + colIdx]: value } };
+      }),
+    }));
+  };
+
+  // Popover único e compartilhado por TODA a formatação por linha/coluna
+  // (cor, fonte, largura, confirmação de remover coluna) nas três telas.
+  // Usa a posição real do botão clicado com `position: fixed` — antes
+  // cada popover usava `position: absolute; top: 100%` preso ao próprio
+  // botão, e numa linha perto do fim da tabela isso abria fora da tela
+  // visível, obrigando a rolar (e parecendo que o clique não fez nada).
+  togglePopover = (key) => (e) => {
+    e.stopPropagation();
+    const btn = e.currentTarget;
+    this.setState(s => {
+      if (s.popover && s.popover.key === key) return { popover: null };
+      const rect = btn.getBoundingClientRect();
+      const estH = 280, estW = 210;
+      const openUp = window.innerHeight - rect.bottom < estH && rect.top > estH;
+      const openLeft = window.innerWidth - rect.left < estW;
+      return {
+        popover: {
+          key,
+          top: openUp ? null : Math.round(rect.bottom + 4),
+          bottom: openUp ? Math.round(window.innerHeight - rect.top + 4) : null,
+          left: openLeft ? null : Math.round(rect.left),
+          right: openLeft ? Math.round(window.innerWidth - rect.right) : null,
+        },
+      };
+    });
+  };
+
+  closePopover = () => this.setState({ popover: null });
+
+  // Tela cheia (pedido do chefe do usuário): some com a barra lateral
+  // nas telas onde a grade é editável, pra sobrar mais espaço horizontal
+  // pra tabela. Só afeta o layout enquanto a tela atual for uma dessas —
+  // ver `fullscreenOn` em renderVals().
+  toggleFullscreen = () => this.setState(s => ({ fullscreen: !s.fullscreen }));
+
+  popoverStyle(s, key) {
+    if (!s.popover || s.popover.key !== key) return null;
+    const p = s.popover;
+    return "position: fixed; z-index: 60;"
+      + (p.top != null ? "top:" + p.top + "px;" : "bottom:" + p.bottom + "px;")
+      + (p.left != null ? "left:" + p.left + "px;" : "right:" + p.right + "px;");
+  }
+
+  pickRowColor = (id, rowNum, color) => () => this.setState(s => ({
+    customTabs: s.customTabs.map(t => t.id === id ? { ...t, rowColors: { ...t.rowColors, [rowNum]: color } } : t),
+    popover: null,
+  }));
+
+  setFrontRowFormat = (id, rowNum, field, value) => () => this.setState(s => ({
+    customTabs: s.customTabs.map(t => t.id === id
+      ? { ...t, rowFormats: { ...t.rowFormats, [rowNum]: { ...(t.rowFormats[rowNum] || {}), [field]: value } } }
+      : t),
+  }));
+
+  setFrontColWidth = (id, colIdx, width) => () => this.setState(s => ({
+    customTabs: s.customTabs.map(t => t.id === id
+      ? { ...t, columnWidths: { ...t.columnWidths, [colIdx]: width } } : t),
+    popover: null,
+  }));
+
+  setFrontCellFormat = (id, rowNum, colIdx, field, value) => () => this.setState(s => ({
+    customTabs: s.customTabs.map(t => t.id === id
+      ? { ...t, cellFormats: { ...t.cellFormats, [rowNum + "," + colIdx]: { ...(t.cellFormats || {})[rowNum + "," + colIdx], [field]: value } } }
+      : t),
+    popover: null,
+  }));
+
+  saveFrontEdits = async (id) => {
+    const tab = this.state.customTabs.find(t => t.id === id);
+    if (!tab) return;
+    const cellEdits = Object.keys(tab.pendingEdits || {}).map(key => {
+      const [rowIdx, colIdx] = key.split(",").map(Number);
+      return { row: tab.pageStart + rowIdx, col: colIdx + 1, value: tab.pageRows[rowIdx][colIdx] };
+    });
+    const rowColors = Object.keys(tab.rowColors || {}).map(rowNum => ({ row: Number(rowNum), color: tab.rowColors[rowNum] || null }));
+    const rowFormats = Object.keys(tab.rowFormats || {}).map(rowNum => ({ row: Number(rowNum), ...tab.rowFormats[rowNum] }));
+    const columnWidths = Object.keys(tab.columnWidths || {}).map(colIdx => ({ col: Number(colIdx) + 1, width: tab.columnWidths[colIdx] }));
+    const cellFormats = Object.keys(tab.cellFormats || {}).map(key => {
+      const [rowNum, colIdx] = key.split(",").map(Number);
+      return { row: rowNum, col: colIdx + 1, ...tab.cellFormats[key] };
+    });
+    if (!cellEdits.length && !rowColors.length && !rowFormats.length && !columnWidths.length && !cellFormats.length) return;
+    if (!window.pywebview || !window.pywebview.api) {
+      this.setState({ toast: "App Python não conectado — abra pelo executável (não pelo navegador)." });
+      return;
+    }
+    this.setState(s => ({ customTabs: s.customTabs.map(t => t.id === id ? { ...t, saving: true } : t) }));
+    try {
+      await window.pywebview.api.apply_sheet_edits(tab.filePath, tab.sheetName, cellEdits, rowColors, rowFormats, columnWidths, cellFormats);
+      this.setState(s => ({
+        customTabs: s.customTabs.map(t => t.id === id ? { ...t, saving: false, pendingEdits: {} } : t),
+        toast: "Alterações salvas em \"" + tab.sheetName + "\".",
+      }));
+    } catch (err) {
+      this.setState(s => ({
+        customTabs: s.customTabs.map(t => t.id === id ? { ...t, saving: false } : t),
+        toast: "Falha ao salvar: " + err,
+      }));
+    }
+  };
+
+  // Excluir coluna de um Front importado é cirurgia na aba inteira do
+  // arquivo real (desloca todas as colunas seguintes, em todas as
+  // linhas — não só na página visível), então: confirma antes (ver
+  // confirma antes via popover), descarta edição pendente da página
+  // (os índices de coluna dela ficariam errados) e recarrega a página
+  // do zero depois.
+  deleteFrontColumn = async (id, colIdx) => {
+    const tab = this.state.customTabs.find(t => t.id === id);
+    if (!tab) return;
+    if (!window.pywebview || !window.pywebview.api) {
+      this.setState({ toast: "App Python não conectado — abra pelo executável (não pelo navegador)." });
+      return;
+    }
+    this.setState(s => ({
+      popover: null,
+      // largura por coluna reseta ao inserir/remover coluna — sem isso o
+      // índice guardado ficaria apontando pra coluna errada depois do
+      // deslocamento.
+      customTabs: s.customTabs.map(t => t.id === id ? { ...t, loading: true, pendingEdits: {}, columnWidths: {}, cellFormats: {} } : t),
+    }));
+    try {
+      await window.pywebview.api.delete_sheet_column(tab.filePath, tab.sheetName, colIdx + 1);
+      this.setState({ toast: "Coluna removida de \"" + tab.sheetName + "\"." });
+      this.loadFrontPage(id, tab.pageStart);
+    } catch (err) {
+      this.setState(s => ({
+        customTabs: s.customTabs.map(t => t.id === id ? { ...t, loading: false } : t),
+        toast: "Falha ao remover coluna: " + err,
+      }));
+    }
+  };
+
+  // Acrescenta uma coluna em branco no fim da aba real do Front — mesma
+  // ideia do "Remover coluna", só que ao contrário (ver insert_cols em
+  // app.fronts.insert_sheet_column).
+  addFrontColumn = async (id) => {
+    const tab = this.state.customTabs.find(t => t.id === id);
+    if (!tab) return;
+    if (!window.pywebview || !window.pywebview.api) {
+      this.setState({ toast: "App Python não conectado — abra pelo executável (não pelo navegador)." });
+      return;
+    }
+    this.setState(s => ({
+      customTabs: s.customTabs.map(t => t.id === id ? { ...t, loading: true, pendingEdits: {}, columnWidths: {}, cellFormats: {} } : t),
+    }));
+    try {
+      await window.pywebview.api.insert_sheet_column(tab.filePath, tab.sheetName, (tab.totalCols || 0) + 1);
+      this.setState({ toast: "Coluna adicionada em \"" + tab.sheetName + "\"." });
+      this.loadFrontPage(id, tab.pageStart);
+    } catch (err) {
+      this.setState(s => ({
+        customTabs: s.customTabs.map(t => t.id === id ? { ...t, loading: false } : t),
+        toast: "Falha ao adicionar coluna: " + err,
+      }));
+    }
+  };
+
   // Letra de coluna estilo Excel a partir de um índice 0-based (0->A, 25->Z, 26->AA...).
   colLetter(n) {
     let s = "", num = n + 1;
@@ -2364,7 +2839,8 @@ class Component extends DCLogic {
   addCustomColumn = (id) => () => this.setState(s => ({
     customTabs: s.customTabs.map(t => t.id === id ? {
       ...t, columns: [...t.columns, "Coluna " + (t.columns.length + 1)],
-      rows: t.rows.map(r => [...r, ""]),
+      columnWidths: [...(t.columnWidths || t.columns.map(() => null)), null],
+      rows: t.rows.map(r => ({ ...r, cells: [...r.cells, ""], cellFormats: {} })),
     } : t),
   }), this.saveCustomTabs);
 
@@ -2380,29 +2856,68 @@ class Component extends DCLogic {
     customTabs: s.customTabs.map(t => (t.id === id && t.columns.length > 1) ? {
       ...t,
       columns: t.columns.filter((_, i) => i !== colIdx),
-      rows: t.rows.map(r => r.filter((_, i) => i !== colIdx)),
+      columnWidths: (t.columnWidths || t.columns.map(() => null)).filter((_, i) => i !== colIdx),
+      rows: t.rows.map(r => ({ ...r, cells: r.cells.filter((_, i) => i !== colIdx), cellFormats: {} })),
     } : t),
   }), this.saveCustomTabs);
 
   addCustomRow = (id) => () => this.setState(s => ({
     customTabs: s.customTabs.map(t => t.id === id
-      ? { ...t, rows: [...t.rows, t.columns.map(() => "")] } : t),
+      ? { ...t, rows: [...t.rows, {
+          id: "cr_" + Date.now() + "_" + Math.floor(Math.random() * 1e4),
+          color: null, fontFamily: null, fontSize: null, height: null,
+          cells: t.columns.map(() => ""), cellFormats: {},
+        }] }
+      : t),
   }), this.saveCustomTabs);
 
-  removeCustomRow = (id, rowIdx) => () => this.setState(s => ({
+  removeCustomRow = (id, rowId) => () => this.setState(s => ({
     customTabs: s.customTabs.map(t => t.id === id
-      ? { ...t, rows: t.rows.filter((_, i) => i !== rowIdx) } : t),
+      ? { ...t, rows: t.rows.filter(r => r.id !== rowId) } : t),
   }), this.saveCustomTabs);
 
-  editCustomCell = (id, rowIdx, colIdx) => (e) => {
+  editCustomCell = (id, rowId, colIdx) => (e) => {
     const value = e.target.value;
     this.setState(s => ({
       customTabs: s.customTabs.map(t => t.id === id ? {
         ...t,
-        rows: t.rows.map((r, ri) => ri === rowIdx ? r.map((c, ci) => (ci === colIdx ? value : c)) : r),
+        rows: t.rows.map(r => r.id === rowId ? { ...r, cells: r.cells.map((c, ci) => (ci === colIdx ? value : c)) } : r),
       } : t),
     }), this.saveCustomTabs);
   };
+
+  pickCustomRowColor = (id, rowId, color) => () => this.setState(s => ({
+    customTabs: s.customTabs.map(t => t.id === id
+      ? { ...t, rows: t.rows.map(r => r.id === rowId ? { ...r, color } : r) } : t),
+    popover: null,
+  }), this.saveCustomTabs);
+
+  // Fonte + altura por linha, largura por coluna — mesma ideia do
+  // ROW_COLOR_OPTIONS, mas com um popover de "..." em vez do quadrinho
+  // de cor (três escolhas: fonte, tamanho, altura).
+  setCustomRowFormat = (id, rowId, field, value) => () => this.setState(s => ({
+    customTabs: s.customTabs.map(t => t.id === id
+      ? { ...t, rows: t.rows.map(r => r.id === rowId ? { ...r, [field]: value } : r) } : t),
+  }), this.saveCustomTabs);
+
+  setCustomCellFormat = (id, rowId, colIdx, field, value) => () => this.setState(s => ({
+    customTabs: s.customTabs.map(t => t.id === id
+      ? { ...t, rows: t.rows.map(r => r.id === rowId
+          ? { ...r, cellFormats: { ...r.cellFormats, [colIdx]: { ...(r.cellFormats || {})[colIdx], [field]: value } } }
+          : r) }
+      : t),
+    popover: null,
+  }), this.saveCustomTabs);
+
+  setCustomColWidth = (id, colIdx, width) => () => this.setState(s => ({
+    customTabs: s.customTabs.map(t => {
+      if (t.id !== id) return t;
+      const widths = t.columns.map((_, i) => (t.columnWidths || [])[i] ?? null);
+      widths[colIdx] = width;
+      return { ...t, columnWidths: widths };
+    }),
+    popover: null,
+  }), this.saveCustomTabs);
 
   // Arrastar as abas customizadas no menu para reordenar (a chave de
   // arraste fica num campo de instância, não em state).
@@ -2534,13 +3049,66 @@ class Component extends DCLogic {
   addResultRow = () => this.setState(s => ({
     resultsRows: [...s.resultsRows, {
       id: "pr_new_" + Date.now(), label: "Nova linha", level: 1, kind: "row",
-      cells: Array(12).fill("0"), total: "0",
+      color: null, fontFamily: null, fontSize: null, height: null,
+      cells: Array(s.resultsColumns.length).fill("0"), cellFormats: {}, total: "0",
     }],
   }));
 
   removeResultRow = (id) => () => this.setState(s => ({
     resultsRows: s.resultsRows.filter(r => r.id !== id),
   }));
+
+  pickResultRowColor = (rowId, color) => () => this.setState(s => ({
+    resultsRows: s.resultsRows.map(r => r.id === rowId ? { ...r, color } : r),
+    popover: null,
+  }));
+
+  // Excluir coluna de mês do Main Results — não existe arquivo por trás
+  // (é dado de demonstração, vive só em state), então é só tirar o mês
+  // da lista e a célula correspondente de cada linha. O total (FY) fica
+  // de fora — sempre presente, não é uma coluna de mês.
+  removeResultColumn = (colIdx) => () => this.setState(s => {
+    if (s.resultsColumns.length <= 1) return null;
+    return {
+      resultsColumns: s.resultsColumns.filter((_, i) => i !== colIdx),
+      resultsColumnWidths: (s.resultsColumnWidths || []).filter((_, i) => i !== colIdx),
+      // cellFormats é um dict indexado por coluna — mais simples resetar
+      // ao mexer na estrutura do que deslocar cada índice (mesmo trade-off
+      // já aceito para columnWidths do Front).
+      resultsRows: s.resultsRows.map(r => ({ ...r, cells: r.cells.filter((_, i) => i !== colIdx), cellFormats: {} })),
+      popover: null,
+    };
+  });
+
+  renameResultColumn = (colIdx) => (e) => {
+    const value = e.target.value;
+    this.setState(s => ({
+      resultsColumns: s.resultsColumns.map((c, i) => (i === colIdx ? value : c)),
+    }));
+  };
+
+  addResultColumn = () => this.setState(s => ({
+    resultsColumns: [...s.resultsColumns, "Col " + (s.resultsColumns.length + 1)],
+    resultsColumnWidths: [...(s.resultsColumnWidths || s.resultsColumns.map(() => null)), null],
+    resultsRows: s.resultsRows.map(r => ({ ...r, cells: [...r.cells, "0"], cellFormats: {} })),
+  }));
+
+  setResultRowFormat = (rowId, field, value) => () => this.setState(s => ({
+    resultsRows: s.resultsRows.map(r => r.id === rowId ? { ...r, [field]: value } : r),
+  }));
+
+  setResultCellFormat = (rowId, colIdx, field, value) => () => this.setState(s => ({
+    resultsRows: s.resultsRows.map(r => r.id === rowId
+      ? { ...r, cellFormats: { ...r.cellFormats, [colIdx]: { ...r.cellFormats[colIdx], [field]: value } } }
+      : r),
+    popover: null,
+  }));
+
+  setResultColWidth = (colIdx, width) => () => this.setState(s => {
+    const widths = s.resultsColumns.map((_, i) => (s.resultsColumnWidths || [])[i] ?? null);
+    widths[colIdx] = width;
+    return { resultsColumnWidths: widths, popover: null };
+  });
 
   startRun = (src) => () => {
     clearInterval(this.timer);
@@ -2626,19 +3194,43 @@ class Component extends DCLogic {
       // Cada aba criada em dest vira uma aba "front" navegável no menu —
       // é isso que faz a importação deixar de ser só "salvei um arquivo"
       // e passar a mostrar o conteúdo dentro do próprio Quick Data.
-      const newTabs = result.created.map(name => ({
-        id: "front_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7),
-        kind: "front", name, filePath: dest, sheetName: name,
-        totalRows: null, totalCols: null, pageRows: null, pageStart: 1, pageSize: 40,
-        loading: false, error: null,
-      }));
-      this.setState(s2 => ({
-        customTabs: [...s2.customTabs, ...newTabs],
-        modal: null, ioBusy: false,
-        screen: newTabs.length ? "custom:" + newTabs[0].id : s2.screen,
-        toast: result.created.length + " aba(s) criada(s) em " + dest.split("\\").pop() + " — disponíveis no menu para visualizar.",
-      }), this.saveCustomTabs);
-      if (newTabs.length) this.loadFrontPage(newTabs[0].id, 1);
+      //
+      // Reimportar o mesmo Front pro mesmo destino não empilha uma aba
+      // nova no menu — atualiza a que já existe (mesmo arquivo + mesmo
+      // nome base, ignorando um sufixo " (N)" que o Python já possa ter
+      // aplicado). Antes disso, reimportar repetido enchia o menu de
+      // cópias "Front (2)", "Front (3)"...
+      const baseName = (n) => n.replace(/\s\(\d+\)$/, "");
+      let firstId = null;
+      this.setState(s2 => {
+        const tabs = s2.customTabs.slice();
+        result.created.forEach(name => {
+          const idx = tabs.findIndex(t => t.kind === "front" && t.filePath === dest && baseName(t.sheetName) === baseName(name));
+          if (idx >= 0) {
+            tabs[idx] = {
+              ...tabs[idx], name, sheetName: name,
+              pageRows: null, pageStart: 1, loading: false, error: null,
+              rowColors: {}, pendingEdits: {}, rowFormats: {}, columnWidths: {}, cellFormats: {},
+            };
+            if (!firstId) firstId = tabs[idx].id;
+          } else {
+            const id = "front_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
+            tabs.push({
+              id, kind: "front", name, filePath: dest, sheetName: name,
+              totalRows: null, totalCols: null, pageRows: null, pageStart: 1, pageSize: 40,
+              loading: false, error: null, rowColors: {}, pendingEdits: {}, saving: false,
+              rowFormats: {}, columnWidths: {}, cellFormats: {},
+            });
+            if (!firstId) firstId = id;
+          }
+        });
+        return {
+          customTabs: tabs, modal: null, ioBusy: false,
+          screen: firstId ? "custom:" + firstId : s2.screen,
+          toast: result.created.length + " aba(s) em " + dest.split("\\").pop() + " — disponíveis no menu para visualizar.",
+        };
+      }, this.saveCustomTabs);
+      if (firstId) this.loadFrontPage(firstId, 1);
     } catch (err) {
       this.setState({ ioBusy: false, toast: "Falha ao importar: " + err });
     }
@@ -2840,6 +3432,13 @@ class Component extends DCLogic {
       w: s.screen === id ? 600 : 500,
     });
     const activeTab = s.customTabs.find(t => "custom:" + t.id === s.screen);
+    // Tela cheia só existe nas 3 telas com grade editável (Main Results,
+    // Nova Aba, Front) — pedido do chefe do usuário pra dar mais espaço
+    // horizontal pra tabela, escondendo a barra lateral.
+    const fullscreenEligible = s.screen === "results" || (activeTab && (activeTab.kind === "custom" || activeTab.kind === "front"));
+    const fullscreenOn = s.fullscreen && fullscreenEligible;
+    const fullscreenLabel = fullscreenOn ? "Sair da tela cheia" : "Tela cheia";
+    const toggleFullscreen = this.toggleFullscreen;
     const SOURCES = [
       { name: "HUBBLE", table: "TB_HUBBLE_CLUSTER_RPD_NEW", rows: "12.000", last: "há 2h", tone: "ok", label: "Extraída" },
       { name: "BASE 1009", table: "VW_DP_1009_CONSOLIDADO", rows: "8.412", last: "há 2h", tone: "ok", label: "Extraída" },
@@ -2881,16 +3480,84 @@ class Component extends DCLogic {
       neg: i % 2 === 1,
     }));
 
-    const pivotRows = s.resultsRows.map(r => ({
+    // Fonte/tamanho/altura de linha e largura de coluna — mesmas listas
+    // de presets (this.FONT_OPTIONS etc.) em Nova Aba, Main Results e
+    // Front; só o "pick" muda por linha/coluna.
+    const fontOptionsFor = (pick) => this.FONT_OPTIONS.map(f => ({ label: f || "Padrão", pick: pick(f) }));
+    const sizeOptionsFor = (pick) => this.FONT_SIZE_OPTIONS.map(sz => ({ label: sz ? String(sz) : "Padrão", pick: pick(sz) }));
+    const heightOptionsFor = (pick) => this.ROW_HEIGHT_OPTIONS.map(o => ({ label: o.label, pick: pick(o.value) }));
+    const widthOptionsFor = (pick) => this.COLUMN_WIDTH_OPTIONS.map(o => ({ label: o.label, pick: pick(o.value) }));
+    const fontStyleOf = (fontFamily, fontSize) =>
+      (fontFamily ? 'font-family:"' + fontFamily + '";' : "") + (fontSize ? "font-size:" + fontSize + "px;" : "");
+
+    // Formatação por célula (cor/fonte/tamanho) — independente da
+    // formatação da linha inteira: os botões ao lado da linha mudam a
+    // linha toda, isso aqui abre um popover embutido na própria célula
+    // e só afeta ela. Sem "sem cor"/limpar herda automaticamente o que
+    // a linha tiver (cf.color/fontFamily/fontSize ausentes = herdado).
+    const cellFmt = (key, cf, rowBg, rowFontFamily, rowFontSize, setField) => ({
+      swatchBg: cf.color ? "#" + cf.color : "transparent",
+      bg: cf.color ? "#" + cf.color : rowBg,
+      fontStyle: fontStyleOf(cf.fontFamily || rowFontFamily, cf.fontSize || rowFontSize),
+      open: !!this.popoverStyle(s, key),
+      popStyle: this.popoverStyle(s, key),
+      toggle: this.togglePopover(key),
+      colorOptions: this.ROW_COLOR_OPTIONS.map(c => ({
+        color: c, swatch: c ? "#" + c : "transparent", pick: setField("color", c),
+      })),
+      fontOptions: this.FONT_OPTIONS.map(f => ({ label: f || "Padrão", pick: setField("fontFamily", f) })),
+      sizeOptions: this.FONT_SIZE_OPTIONS.map(sz => ({ label: sz ? String(sz) : "Padrão", pick: setField("fontSize", sz) })),
+    });
+
+    const pivotRows = s.resultsRows.map(r => {
+      const rowBg = r.color ? "#" + r.color
+        : r.kind === "total" ? "color-mix(in oklab, var(--brand-primary) 12%, transparent)"
+        : r.kind === "sub" ? "var(--surface-2)" : "transparent";
+      return {
       id: r.id, kind: r.kind,
       pad: 16 + r.level * 18,
       weight: r.kind === "total" ? 700 : r.kind === "sub" ? 600 : 400,
       italic: r.kind === "note" ? "italic" : "normal",
-      bg: r.kind === "total" ? "color-mix(in oklab, var(--brand-primary) 12%, transparent)" : r.kind === "sub" ? "var(--surface-2)" : "transparent",
+      bg: rowBg,
+      swatchBg: r.color ? "#" + r.color : "transparent",
+      colorOpen: !!this.popoverStyle(s, "results-color-" + r.id),
+      colorPopStyle: this.popoverStyle(s, "results-color-" + r.id),
+      toggleColor: this.togglePopover("results-color-" + r.id),
+      colorOptions: this.ROW_COLOR_OPTIONS.map(c => ({
+        color: c, swatch: c ? "#" + c : "transparent", pick: this.pickResultRowColor(r.id, c),
+      })),
+      rowHeight: r.height ? r.height + "px" : "var(--row-h)",
+      fontStyle: fontStyleOf(r.fontFamily, r.fontSize),
+      formatOpen: !!this.popoverStyle(s, "results-format-" + r.id),
+      formatPopStyle: this.popoverStyle(s, "results-format-" + r.id),
+      toggleFormat: this.togglePopover("results-format-" + r.id),
+      fontOptions: fontOptionsFor(f => this.setResultRowFormat(r.id, "fontFamily", f)),
+      sizeOptions: sizeOptionsFor(sz => this.setResultRowFormat(r.id, "fontSize", sz)),
+      heightOptions: heightOptionsFor(h => this.setResultRowFormat(r.id, "height", h)),
       label: r.label, renameLabel: this.renameResultRow(r.id),
-      cells: r.cells.map((v, ci) => ({ value: v, edit: this.editResultCell(r.id, ci) })),
+      cells: r.cells.map((v, ci) => ({
+        value: v, edit: this.editResultCell(r.id, ci),
+        colWidth: ((s.resultsColumnWidths || [])[ci] || 92) + "px",
+        ...cellFmt("results-cell-" + r.id + "-" + ci, r.cellFormats[ci] || {}, rowBg, r.fontFamily, r.fontSize,
+          (field, value) => this.setResultCellFormat(r.id, ci, field, value)),
+      })),
       total: r.total, editTotal: this.editResultTotal(r.id),
       remove: this.removeResultRow(r.id),
+      };
+    });
+
+    const resultsColumns = s.resultsColumns.map((m, ci) => ({
+      label: m, rename: this.renameResultColumn(ci),
+      confirmOpen: !!this.popoverStyle(s, "results-delcol-" + ci),
+      confirmPopStyle: this.popoverStyle(s, "results-delcol-" + ci),
+      toggleConfirm: this.togglePopover("results-delcol-" + ci),
+      confirmDelete: this.removeResultColumn(ci),
+      canDelete: s.resultsColumns.length > 1,
+      widthOpen: !!this.popoverStyle(s, "results-width-" + ci),
+      widthPopStyle: this.popoverStyle(s, "results-width-" + ci),
+      toggleWidth: this.togglePopover("results-width-" + ci),
+      widthOptions: widthOptionsFor(w => this.setResultColWidth(ci, w)),
+      colWidth: ((s.resultsColumnWidths || [])[ci] || 92) + "px",
     }));
 
     const resultsFilterDrop = (key, current, options) => ({
@@ -3141,6 +3808,15 @@ class Component extends DCLogic {
       tAuxFg: s.configTab === "aux" ? "var(--brand-primary)" : "var(--fg-muted)",
       tUsuariosBorder: s.configTab === "usuarios" ? "var(--brand-primary)" : "transparent",
       tUsuariosFg: s.configTab === "usuarios" ? "var(--brand-primary)" : "var(--fg-muted)",
+      fullscreenOn, fullscreenLabel, toggleFullscreen,
+      gridCols: fullscreenOn ? "1fr" : "var(--sidebar-w) 1fr",
+      mainCol: fullscreenOn ? 1 : 2,
+      // Em tela cheia o teto de largura do conteúdo (1200/1400px) some —
+      // senão a tabela continuava do mesmo tamanho e só sobrava espaço
+      // em branco à direita num monitor grande, mesmo com a barra
+      // lateral escondida.
+      screenMaxWidth1200: fullscreenOn ? "none" : "1200px",
+      screenMaxWidth1400: fullscreenOn ? "none" : "1400px",
       isHome: s.screen === "home", isExtracao: s.screen === "extracao", isAjustes: s.screen === "ajustes",
       isResults: s.screen === "results", isHistorico: s.screen === "historico", isLog: s.screen === "log",
       isConfig: s.screen === "config", isManual: s.screen === "manual", isBug: s.screen === "bug",
@@ -3161,12 +3837,51 @@ class Component extends DCLogic {
         pageStart: activeTab.pageStart,
         pageEnd: activeTab.pageStart + (activeTab.pageRows ? activeTab.pageRows.length : 0) - 1,
         hasRows: !!(activeTab.pageRows && activeTab.pageRows.length),
-        gridTemplate: "52px " + Array(activeTab.totalCols || 1).fill("minmax(96px, 1fr)").join(" "),
-        colLetters: Array.from({ length: activeTab.totalCols || 0 }, (_, i) => this.colLetter(i)),
-        displayRows: (activeTab.pageRows || []).map((r, ri) => ({
-          num: activeTab.pageStart + ri,
-          cells: r.map(v => (v === null || v === undefined ? "" : String(v))),
+        gridTemplate: "52px 40px " + Array.from({ length: activeTab.totalCols || 1 }, (_, i) =>
+          (activeTab.columnWidths || {})[i] ? activeTab.columnWidths[i] + "px" : "minmax(96px, 1fr)"
+        ).join(" ") + " 32px",
+        colLetters: Array.from({ length: activeTab.totalCols || 0 }, (_, i) => ({
+          letter: this.colLetter(i),
+          confirmOpen: !!this.popoverStyle(s, "front-delcol-" + i),
+          confirmPopStyle: this.popoverStyle(s, "front-delcol-" + i),
+          toggleConfirm: this.togglePopover("front-delcol-" + i),
+          confirmDelete: () => this.deleteFrontColumn(activeTab.id, i),
+          widthOpen: !!this.popoverStyle(s, "front-width-" + i),
+          widthPopStyle: this.popoverStyle(s, "front-width-" + i),
+          toggleWidth: this.togglePopover("front-width-" + i),
+          widthOptions: widthOptionsFor(w => this.setFrontColWidth(activeTab.id, i, w)),
         })),
+        displayRows: (activeTab.pageRows || []).map((r, ri) => {
+          const num = activeTab.pageStart + ri;
+          const color = activeTab.rowColors[num];
+          const fmt = activeTab.rowFormats[num] || {};
+          return {
+            num, rowIdx: ri,
+            bg: color ? "#" + color : "transparent",
+            colorOpen: !!this.popoverStyle(s, "front-color-" + num),
+            colorPopStyle: this.popoverStyle(s, "front-color-" + num),
+            toggleColor: this.togglePopover("front-color-" + num),
+            colorOptions: this.ROW_COLOR_OPTIONS.map(c => ({
+              color: c, swatch: c ? "#" + c : "transparent",
+              pick: this.pickRowColor(activeTab.id, num, c),
+            })),
+            rowHeight: fmt.height ? fmt.height + "px" : "auto",
+            fontStyle: fontStyleOf(fmt.fontFamily, fmt.fontSize),
+            formatOpen: !!this.popoverStyle(s, "front-format-" + num),
+            formatPopStyle: this.popoverStyle(s, "front-format-" + num),
+            toggleFormat: this.togglePopover("front-format-" + num),
+            fontOptions: fontOptionsFor(f => this.setFrontRowFormat(activeTab.id, num, "fontFamily", f)),
+            sizeOptions: sizeOptionsFor(sz => this.setFrontRowFormat(activeTab.id, num, "fontSize", sz)),
+            heightOptions: heightOptionsFor(h => this.setFrontRowFormat(activeTab.id, num, "height", h)),
+            cells: r.map((v, ci) => ({
+              value: v === null || v === undefined ? "" : String(v),
+              edit: this.editFrontCell(activeTab.id, ri, ci),
+              ...cellFmt("front-cell-" + num + "-" + ci, (activeTab.cellFormats || {})[num + "," + ci] || {},
+                color ? "#" + color : "transparent", fmt.fontFamily, fmt.fontSize,
+                (field, value) => this.setFrontCellFormat(activeTab.id, num, ci, field, value)),
+            })),
+          };
+        }),
         canPrev: activeTab.pageStart > 1,
         canNext: !!activeTab.totalRows && (activeTab.pageStart + (activeTab.pageRows ? activeTab.pageRows.length : 0) - 1) < activeTab.totalRows,
         prevOpacity: activeTab.pageStart > 1 ? 1 : .45,
@@ -3174,18 +3889,59 @@ class Component extends DCLogic {
         prevPage: () => this.loadFrontPage(activeTab.id, Math.max(1, activeTab.pageStart - activeTab.pageSize)),
         nextPage: () => this.loadFrontPage(activeTab.id, activeTab.pageStart + activeTab.pageSize),
         reload: () => this.loadFrontPage(activeTab.id, activeTab.pageStart),
+        dirty: Object.keys(activeTab.pendingEdits || {}).length > 0
+          || Object.keys(activeTab.rowFormats || {}).length > 0
+          || Object.keys(activeTab.columnWidths || {}).length > 0
+          || Object.keys(activeTab.cellFormats || {}).length > 0,
+        saving: activeTab.saving,
+        saveLabel: activeTab.saving ? "Salvando…" : "Salvar alterações",
+        saveOpacity: (Object.keys(activeTab.pendingEdits || {}).length > 0
+          || Object.keys(activeTab.rowFormats || {}).length > 0
+          || Object.keys(activeTab.columnWidths || {}).length > 0
+          || Object.keys(activeTab.cellFormats || {}).length > 0) ? 1 : .5,
+        saveEdits: () => this.saveFrontEdits(activeTab.id),
+        addColumn: () => this.addFrontColumn(activeTab.id),
       } : {
         kind: "custom",
         name: activeTab.name, rename: this.renameCustomTab(activeTab.id),
         addColumn: this.addCustomColumn(activeTab.id), addRow: this.addCustomRow(activeTab.id),
-        gridTemplate: activeTab.columns.map(() => "minmax(120px, 1fr)").join(" ") + " 44px",
+        gridTemplate: "64px " + activeTab.columns.map((c, ci) =>
+          ((activeTab.columnWidths || [])[ci] ? activeTab.columnWidths[ci] + "px" : "minmax(120px, 1fr)")
+        ).join(" ") + " 44px",
         columns: activeTab.columns.map((c, ci) => ({
           value: c, rename: this.renameCustomColumn(activeTab.id, ci), remove: this.removeCustomColumn(activeTab.id, ci),
+          widthOpen: !!this.popoverStyle(s, "custom-width-" + ci),
+          widthPopStyle: this.popoverStyle(s, "custom-width-" + ci),
+          toggleWidth: this.togglePopover("custom-width-" + ci),
+          widthOptions: widthOptionsFor(w => this.setCustomColWidth(activeTab.id, ci, w)),
         })),
-        rows: activeTab.rows.map((r, ri) => ({
-          remove: this.removeCustomRow(activeTab.id, ri),
-          cells: r.map((v, ci) => ({ value: v, edit: this.editCustomCell(activeTab.id, ri, ci) })),
-        })),
+        rows: activeTab.rows.map(r => {
+          const rowBg = r.color ? "#" + r.color : "transparent";
+          return {
+          bg: rowBg,
+          colorOpen: !!this.popoverStyle(s, "custom-color-" + r.id),
+          colorPopStyle: this.popoverStyle(s, "custom-color-" + r.id),
+          toggleColor: this.togglePopover("custom-color-" + r.id),
+          colorOptions: this.ROW_COLOR_OPTIONS.map(c => ({
+            color: c, swatch: c ? "#" + c : "transparent",
+            pick: this.pickCustomRowColor(activeTab.id, r.id, c),
+          })),
+          rowHeight: r.height ? r.height + "px" : "auto",
+          fontStyle: fontStyleOf(r.fontFamily, r.fontSize),
+          formatOpen: !!this.popoverStyle(s, "custom-format-" + r.id),
+          formatPopStyle: this.popoverStyle(s, "custom-format-" + r.id),
+          toggleFormat: this.togglePopover("custom-format-" + r.id),
+          fontOptions: fontOptionsFor(f => this.setCustomRowFormat(activeTab.id, r.id, "fontFamily", f)),
+          sizeOptions: sizeOptionsFor(sz => this.setCustomRowFormat(activeTab.id, r.id, "fontSize", sz)),
+          heightOptions: heightOptionsFor(h => this.setCustomRowFormat(activeTab.id, r.id, "height", h)),
+          remove: this.removeCustomRow(activeTab.id, r.id),
+          cells: r.cells.map((v, ci) => ({
+            value: v, edit: this.editCustomCell(activeTab.id, r.id, ci),
+            ...cellFmt("custom-cell-" + r.id + "-" + ci, (r.cellFormats || {})[ci] || {}, rowBg, r.fontFamily, r.fontSize,
+              (field, value) => this.setCustomCellFormat(activeTab.id, r.id, ci, field, value)),
+          })),
+          };
+        }),
       },
       navHome: nav("home"), navExtracao: nav("extracao"), navAjustes: nav("ajustes"), navResults: nav("results"),
       navHistorico: nav("historico"), navLog: nav("log"), navConfig: nav("config"), navManual: nav("manual"),
@@ -3312,7 +4068,8 @@ class Component extends DCLogic {
         /removido|alterado|cadastrado/i.test(s.toast) ? "Cadastro atualizado" : "Operação finalizada",
       toastColor: !s.toast ? "var(--status-ok)" :
         /restrit|não pode|não autorizada|já está|Informe|cancelad/i.test(s.toast) ? "var(--status-warn)" : "var(--status-ok)",
-      sources, months: MONTHS, gridRows, pivotRows, resultsFilters, addResultRow: this.addResultRow,
+      sources, months: MONTHS, gridRows, pivotRows, resultsColumns, resultsFilters, addResultRow: this.addResultRow,
+      addResultColumn: this.addResultColumn,
       history, logLines, swatches, auxFiles, manualSections,
     };
   }
