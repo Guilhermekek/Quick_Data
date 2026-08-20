@@ -619,21 +619,49 @@ a:hover { color: var(--brand-primary-hover); text-decoration: underline; }
         <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px var(--pad-card); margin-bottom: var(--gap)">
           <div style="font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 12px">Menu de seleção</div>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px">
-            <div style="display: flex; flex-direction: column; gap: 6px">
+            <div style="display: flex; flex-direction: column; gap: 6px; position: relative">
               <label style="font-size: 12px; font-weight: 500; color: var(--fg-muted)">EMPRESA</label>
-              <div style="height: var(--row-h); padding: 0 12px; display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); font-weight: 500">Mobile + WTTx<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="var(--fg-faint)"><path d="m5 9 7 7 7-7" stroke-width="2" stroke-linecap="round"></path></svg></div>
+              <button onClick="{{ resultsFilters.empresa.toggle }}" style="height: var(--row-h); padding: 0 12px; display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); font-weight: 500; color: var(--fg); text-align: left" style-hover="background: var(--surface-hover)">{{ resultsFilters.empresa.value }}<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="var(--fg-faint)" style="flex: none"><path d="m5 9 7 7 7-7" stroke-width="2" stroke-linecap="round"></path></svg></button>
+              <sc-if value="{{ resultsFilters.empresa.open }}" hint-placeholder-val="{{ false }}">
+                <div style="position: absolute; top: 100%; left: 0; right: 0; z-index: 5; margin-top: 4px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow-pop); overflow: hidden">
+                  <sc-for list="{{ resultsFilters.empresa.options }}" as="opt" hint-placeholder-count="4">
+                    <button onClick="{{ opt.pick }}" style="display: block; width: 100%; padding: 9px 12px; background: transparent; border: 0; border-bottom: 1px solid var(--border); text-align: left; color: var(--fg); font-size: 12.5px" style-hover="background: var(--surface-hover)">{{ opt.value }}</button>
+                  </sc-for>
+                </div>
+              </sc-if>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 6px">
+            <div style="display: flex; flex-direction: column; gap: 6px; position: relative">
               <label style="font-size: 12px; font-weight: 500; color: var(--fg-muted)">ABERTURA</label>
-              <div style="height: var(--row-h); padding: 0 12px; display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); font-weight: 500">Net Service Revenues<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="var(--fg-faint)"><path d="m5 9 7 7 7-7" stroke-width="2" stroke-linecap="round"></path></svg></div>
+              <button onClick="{{ resultsFilters.abertura.toggle }}" style="height: var(--row-h); padding: 0 12px; display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); font-weight: 500; color: var(--fg); text-align: left" style-hover="background: var(--surface-hover)">{{ resultsFilters.abertura.value }}<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="var(--fg-faint)" style="flex: none"><path d="m5 9 7 7 7-7" stroke-width="2" stroke-linecap="round"></path></svg></button>
+              <sc-if value="{{ resultsFilters.abertura.open }}" hint-placeholder-val="{{ false }}">
+                <div style="position: absolute; top: 100%; left: 0; right: 0; z-index: 5; margin-top: 4px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow-pop); overflow: hidden">
+                  <sc-for list="{{ resultsFilters.abertura.options }}" as="opt" hint-placeholder-count="4">
+                    <button onClick="{{ opt.pick }}" style="display: block; width: 100%; padding: 9px 12px; background: transparent; border: 0; border-bottom: 1px solid var(--border); text-align: left; color: var(--fg); font-size: 12.5px" style-hover="background: var(--surface-hover)">{{ opt.value }}</button>
+                  </sc-for>
+                </div>
+              </sc-if>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 6px">
+            <div style="display: flex; flex-direction: column; gap: 6px; position: relative">
               <label style="font-size: 12px; font-weight: 500; color: var(--fg-muted)">LINHA_BD</label>
-              <div style="height: var(--row-h); padding: 0 12px; display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); font-weight: 500">232 · 246 · 247<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="var(--fg-faint)"><path d="m5 9 7 7 7-7" stroke-width="2" stroke-linecap="round"></path></svg></div>
+              <button onClick="{{ resultsFilters.linhaBd.toggle }}" style="height: var(--row-h); padding: 0 12px; display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); font-weight: 500; color: var(--fg); text-align: left" style-hover="background: var(--surface-hover)">{{ resultsFilters.linhaBd.value }}<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="var(--fg-faint)" style="flex: none"><path d="m5 9 7 7 7-7" stroke-width="2" stroke-linecap="round"></path></svg></button>
+              <sc-if value="{{ resultsFilters.linhaBd.open }}" hint-placeholder-val="{{ false }}">
+                <div style="position: absolute; top: 100%; left: 0; right: 0; z-index: 5; margin-top: 4px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow-pop); overflow: hidden">
+                  <sc-for list="{{ resultsFilters.linhaBd.options }}" as="opt" hint-placeholder-count="4">
+                    <button onClick="{{ opt.pick }}" style="display: block; width: 100%; padding: 9px 12px; background: transparent; border: 0; border-bottom: 1px solid var(--border); text-align: left; color: var(--fg); font-size: 12.5px" style-hover="background: var(--surface-hover)">{{ opt.value }}</button>
+                  </sc-for>
+                </div>
+              </sc-if>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 6px">
+            <div style="display: flex; flex-direction: column; gap: 6px; position: relative">
               <label style="font-size: 12px; font-weight: 500; color: var(--fg-muted)">IFRS_CONTABIL</label>
-              <div style="height: var(--row-h); padding: 0 12px; display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); font-weight: 500">w/o IFRS<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="var(--fg-faint)"><path d="m5 9 7 7 7-7" stroke-width="2" stroke-linecap="round"></path></svg></div>
+              <button onClick="{{ resultsFilters.ifrs.toggle }}" style="height: var(--row-h); padding: 0 12px; display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); font-weight: 500; color: var(--fg); text-align: left" style-hover="background: var(--surface-hover)">{{ resultsFilters.ifrs.value }}<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="var(--fg-faint)" style="flex: none"><path d="m5 9 7 7 7-7" stroke-width="2" stroke-linecap="round"></path></svg></button>
+              <sc-if value="{{ resultsFilters.ifrs.open }}" hint-placeholder-val="{{ false }}">
+                <div style="position: absolute; top: 100%; left: 0; right: 0; z-index: 5; margin-top: 4px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow-pop); overflow: hidden">
+                  <sc-for list="{{ resultsFilters.ifrs.options }}" as="opt" hint-placeholder-count="4">
+                    <button onClick="{{ opt.pick }}" style="display: block; width: 100%; padding: 9px 12px; background: transparent; border: 0; border-bottom: 1px solid var(--border); text-align: left; color: var(--fg); font-size: 12.5px" style-hover="background: var(--surface-hover)">{{ opt.value }}</button>
+                  </sc-for>
+                </div>
+              </sc-if>
             </div>
           </div>
           <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border)">
@@ -656,24 +684,38 @@ a:hover { color: var(--brand-primary-hover); text-decoration: underline; }
                     <th style="text-align: right; font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #fff; padding: 11px 14px; background: var(--brand-primary); white-space: nowrap">{{ m }}</th>
                   </sc-for>
                   <th style="text-align: right; font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #fff; padding: 11px 16px; background: var(--brand-primary-active); white-space: nowrap">FY 2026</th>
+                  <th style="width: 36px; background: var(--brand-primary)"></th>
                 </tr>
               </thead>
               <tbody>
                 <sc-for list="{{ pivotRows }}" as="p" hint-placeholder-count="14">
                   <tr style-hover="background: var(--row-hover)">
-                    <td style="position: sticky; left: 0; z-index: 2; height: var(--row-h); padding-right: 16px; padding-left: {{ p.pad }}px; background: var(--surface); border-bottom: 1px solid var(--border); border-right: 2px solid var(--border-strong); font-weight: {{ p.weight }}; font-style: {{ p.italic }}; white-space: nowrap">{{ p.label }}</td>
+                    <td style="position: sticky; left: 0; z-index: 2; height: var(--row-h); padding: 0 16px 0 {{ p.pad }}px; background: var(--surface); border-bottom: 1px solid var(--border); border-right: 2px solid var(--border-strong); white-space: nowrap">
+                      <input value="{{ p.label }}" onChange="{{ p.renameLabel }}" style="width: 100%; border: 0; background: transparent; color: var(--fg); font-weight: {{ p.weight }}; font-style: {{ p.italic }}; font-size: 12.5px" />
+                    </td>
                     <sc-for list="{{ p.cells }}" as="c" hint-placeholder-count="12">
-                      <td style="height: var(--row-h); padding: 0 14px; border-bottom: 1px solid var(--border); text-align: right; font-variant-numeric: tabular-nums; font-weight: {{ p.weight }}; background: {{ p.bg }}">{{ c }}</td>
+                      <td style="height: var(--row-h); padding: 0; border-bottom: 1px solid var(--border); background: {{ p.bg }}">
+                        <input value="{{ c.value }}" onChange="{{ c.edit }}" style="width: 100%; border: 0; background: transparent; padding: 0 14px; text-align: right; font-variant-numeric: tabular-nums; font-weight: {{ p.weight }}; color: var(--fg); font-size: 12.5px" />
+                      </td>
                     </sc-for>
-                    <td style="height: var(--row-h); padding: 0 16px; border-bottom: 1px solid var(--border); text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; background: var(--surface-3)">{{ p.total }}</td>
+                    <td style="height: var(--row-h); padding: 0; border-bottom: 1px solid var(--border); background: var(--surface-3)">
+                      <input value="{{ p.total }}" onChange="{{ p.editTotal }}" style="width: 100%; border: 0; background: transparent; padding: 0 16px; text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; color: var(--fg); font-size: 12.5px" />
+                    </td>
+                    <td style="height: var(--row-h); padding: 0; border-bottom: 1px solid var(--border); text-align: center">
+                      <button onClick="{{ p.remove }}" title="Remover linha" style="display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; border: 0; background: transparent; color: var(--status-err)">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor"><path d="M6 6l12 12M18 6 6 18" stroke-width="2" stroke-linecap="round"></path></svg>
+                      </button>
+                    </td>
                   </tr>
                 </sc-for>
               </tbody>
             </table>
           </div>
           <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 18px; background: var(--surface-2); border-top: 1px solid var(--border); font-size: 11.5px; color: var(--fg-faint)">
-            <span>23 linhas de P&amp;L · totais e subtotais destacados</span>
-            <span>Gerado a partir de 28.221 linhas da BASE QUICK DATA</span>
+            <button onClick="{{ addResultRow }}" style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 12px; border-radius: var(--radius-sm); border: 1.5px dashed var(--border-strong); background: transparent; color: var(--fg-muted); font-size: 11.5px; font-weight: 700" style-hover="border-color: var(--brand-primary); color: var(--brand-primary)">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14" stroke-width="2.4" stroke-linecap="round"></path></svg>Nova linha
+            </button>
+            <span>Editável célula a célula · salvo enquanto o app estiver aberto</span>
           </div>
         </div>
       </div>
@@ -2064,6 +2106,45 @@ class Component extends DCLogic {
       arquivo: null, aba: "", mesIni: "Jan", mesFim: "Dez", mesPreview: "Jan",
       pasta: null, criterio: "", cenarios: {},
     },
+    // Main Results — grade do relatório e filtros do "Menu de seleção",
+    // ambos editáveis direto na tela (rótulo, células, total, + Nova
+    // linha), como o usuário pediu. Semente computada uma única vez
+    // aqui; depois disso vive só em state.
+    resultsFilters: {
+      empresa: "Mobile + WTTx", abertura: "Net Service Revenues",
+      linhaBd: "232 · 246 · 247", ifrs: "w/o IFRS",
+    },
+    resultsFilterOpen: null,
+    resultsRows: [
+      ["Net Revenues", 0, "total", 4182300],
+      ["Service Revenues", 1, "sub", 3914800],
+      ["Serv. Mobile", 2, "sub", 3520100],
+      ["of which NBI w/o IFRS 15", 3, "note", 118400],
+      ["IFRS", 3, "row", 3401700],
+      ["w/o IFRS", 3, "row", 3520100],
+      ["Outgoing", 2, "sub", 2988400],
+      ["PrePaid", 3, "row", 604200],
+      ["PostPaid", 3, "row", 2384200],
+      ["Control", 4, "row", 411800],
+      ["Consumer", 4, "row", 1204600],
+      ["Corporate", 4, "row", 767800],
+      ["TOP", 5, "row", 402100],
+      ["SMB", 5, "row", 365700],
+      ["Wholesale", 4, "row", 88400],
+      ["Data Only", 3, "row", 311900],
+      ["Browsing", 4, "row", 244100],
+      ["VTTx", 4, "row", 41200],
+      ["M2M", 4, "row", 26600],
+      ["Incoming", 2, "sub", 262800],
+      ["Others", 2, "sub", 268900],
+      ["Serv. Fixed", 2, "sub", 394700],
+      ["Product Revenues", 1, "sub", 267500],
+    ].map(([label, level, kind, base], idx) => ({
+      id: "pr" + idx, label, level, kind,
+      cells: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(j =>
+        Math.round(base / 12 * (1 + (j % 5) * 0.03)).toLocaleString("pt-BR")),
+      total: base.toLocaleString("pt-BR"),
+    })),
     selUser: null,
     newUser: { id: "", name: "", area: "P&C · Consolidation", role: "user" },
     users: [
@@ -2420,6 +2501,47 @@ class Component extends DCLogic {
     this.startRun(source)();
   };
 
+  // Main Results — filtros do "Menu de seleção" (Empresa/Abertura/
+  // Linha_BD/IFRS_Contábil) viram dropdowns de verdade, e a grade do
+  // relatório vira editável (rótulo, cada mês, total, + Nova linha),
+  // igual à edição de célula que já existe na aba "Nova Aba".
+  toggleResultsFilter = (key) => () => this.setState(s => ({
+    resultsFilterOpen: s.resultsFilterOpen === key ? null : key,
+  }));
+
+  pickResultsFilter = (key, value) => () => this.setState(s => ({
+    resultsFilters: { ...s.resultsFilters, [key]: value }, resultsFilterOpen: null,
+  }));
+
+  renameResultRow = (id) => (e) => {
+    const label = e.target.value;
+    this.setState(s => ({ resultsRows: s.resultsRows.map(r => r.id === id ? { ...r, label } : r) }));
+  };
+
+  editResultCell = (id, colIdx) => (e) => {
+    const value = e.target.value;
+    this.setState(s => ({
+      resultsRows: s.resultsRows.map(r => r.id === id
+        ? { ...r, cells: r.cells.map((c, i) => (i === colIdx ? value : c)) } : r),
+    }));
+  };
+
+  editResultTotal = (id) => (e) => {
+    const total = e.target.value;
+    this.setState(s => ({ resultsRows: s.resultsRows.map(r => r.id === id ? { ...r, total } : r) }));
+  };
+
+  addResultRow = () => this.setState(s => ({
+    resultsRows: [...s.resultsRows, {
+      id: "pr_new_" + Date.now(), label: "Nova linha", level: 1, kind: "row",
+      cells: Array(12).fill("0"), total: "0",
+    }],
+  }));
+
+  removeResultRow = (id) => () => this.setState(s => ({
+    resultsRows: s.resultsRows.filter(r => r.id !== id),
+  }));
+
   startRun = (src) => () => {
     clearInterval(this.timer);
     this.setState({ running: true, pct: 0, stepIdx: 0, runSource: src, screen: "extracao" });
@@ -2759,40 +2881,28 @@ class Component extends DCLogic {
       neg: i % 2 === 1,
     }));
 
-    const PIVOT = [
-      ["Net Revenues", 0, "total", 4182300],
-      ["Service Revenues", 1, "sub", 3914800],
-      ["Serv. Mobile", 2, "sub", 3520100],
-      ["of which NBI w/o IFRS 15", 3, "note", 118400],
-      ["IFRS", 3, "row", 3401700],
-      ["w/o IFRS", 3, "row", 3520100],
-      ["Outgoing", 2, "sub", 2988400],
-      ["PrePaid", 3, "row", 604200],
-      ["PostPaid", 3, "row", 2384200],
-      ["Control", 4, "row", 411800],
-      ["Consumer", 4, "row", 1204600],
-      ["Corporate", 4, "row", 767800],
-      ["TOP", 5, "row", 402100],
-      ["SMB", 5, "row", 365700],
-      ["Wholesale", 4, "row", 88400],
-      ["Data Only", 3, "row", 311900],
-      ["Browsing", 4, "row", 244100],
-      ["VTTx", 4, "row", 41200],
-      ["M2M", 4, "row", 26600],
-      ["Incoming", 2, "sub", 262800],
-      ["Others", 2, "sub", 268900],
-      ["Serv. Fixed", 2, "sub", 394700],
-      ["Product Revenues", 1, "sub", 267500],
-    ];
-    const pivotRows = PIVOT.map(([label, level, kind, base]) => ({
-      label, kind,
-      pad: 16 + level * 18,
-      weight: kind === "total" ? 700 : kind === "sub" ? 600 : 400,
-      italic: kind === "note" ? "italic" : "normal",
-      bg: kind === "total" ? "color-mix(in oklab, var(--brand-primary) 12%, transparent)" : kind === "sub" ? "var(--surface-2)" : "transparent",
-      cells: MONTHS.map((m, j) => fmt(Math.round(base / 12 * (1 + (j % 5) * 0.03)))),
-      total: fmt(base),
+    const pivotRows = s.resultsRows.map(r => ({
+      id: r.id, kind: r.kind,
+      pad: 16 + r.level * 18,
+      weight: r.kind === "total" ? 700 : r.kind === "sub" ? 600 : 400,
+      italic: r.kind === "note" ? "italic" : "normal",
+      bg: r.kind === "total" ? "color-mix(in oklab, var(--brand-primary) 12%, transparent)" : r.kind === "sub" ? "var(--surface-2)" : "transparent",
+      label: r.label, renameLabel: this.renameResultRow(r.id),
+      cells: r.cells.map((v, ci) => ({ value: v, edit: this.editResultCell(r.id, ci) })),
+      total: r.total, editTotal: this.editResultTotal(r.id),
+      remove: this.removeResultRow(r.id),
     }));
+
+    const resultsFilterDrop = (key, current, options) => ({
+      value: current, open: s.resultsFilterOpen === key, toggle: this.toggleResultsFilter(key),
+      options: options.map(v => ({ value: v, pick: this.pickResultsFilter(key, v) })),
+    });
+    const resultsFilters = {
+      empresa: resultsFilterDrop("empresa", s.resultsFilters.empresa, ["Mobile + WTTx", "TBP", "CTCEL", "LINOS", "METIS_OG"]),
+      abertura: resultsFilterDrop("abertura", s.resultsFilters.abertura, ["Net Service Revenues", "Net Product Revenues", "Total Revenues", "OpEx", "EBITDA"]),
+      linhaBd: resultsFilterDrop("linhaBd", s.resultsFilters.linhaBd, ["232 · 246 · 247", "301 · 302", "410", "Todas"]),
+      ifrs: resultsFilterDrop("ifrs", s.resultsFilters.ifrs, ["w/o IFRS", "IFRS", "Ambos"]),
+    };
 
     const history = [
       ["2026-08-14 03:41", "HUBBLE", "Extração", "1m 42s", "12.000", "ok", "Concluída"],
@@ -3202,7 +3312,8 @@ class Component extends DCLogic {
         /removido|alterado|cadastrado/i.test(s.toast) ? "Cadastro atualizado" : "Operação finalizada",
       toastColor: !s.toast ? "var(--status-ok)" :
         /restrit|não pode|não autorizada|já está|Informe|cancelad/i.test(s.toast) ? "var(--status-warn)" : "var(--status-ok)",
-      sources, months: MONTHS, gridRows, pivotRows, history, logLines, swatches, auxFiles, manualSections,
+      sources, months: MONTHS, gridRows, pivotRows, resultsFilters, addResultRow: this.addResultRow,
+      history, logLines, swatches, auxFiles, manualSections,
     };
   }
 }
