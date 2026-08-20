@@ -77,6 +77,50 @@ def _unique_sheet_name(wb: openpyxl.Workbook, desired: str) -> str:
     return f"{desired} ({n})"
 
 
+def _json_safe(value):
+    """openpyxl devolve datetime/Decimal/etc. para algumas células — troca
+    qualquer coisa que não seja um tipo JSON nativo pela representação em
+    texto, só para exibição no viewer (não é usado para gravar arquivo)."""
+    if value is None or isinstance(value, (int, float, str, bool)):
+        return value
+    return str(value)
+
+
+def get_sheet_data(path: str, sheet_name: str, start_row: int = 1, max_rows: int = 40) -> dict:
+    """Lê uma página de linhas de uma aba para o visualizador do app —
+    a função que faltava para a Importação de Front deixar de ser só
+    "salva um arquivo novo" e passar a mostrar o conteúdo dentro do
+    próprio Quick Data, como a planilha original sempre fez (lá a aba
+    importada é uma aba de Excel de verdade, então "ver" era só olhar
+    pra ela). Pagina em vez de carregar a aba inteira de uma vez — Fronts
+    reais chegam a ter centenas de colunas e milhares de linhas.
+    """
+    wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
+    try:
+        if sheet_name not in wb.sheetnames:
+            raise ValueError(f'Aba "{sheet_name}" não existe em {Path(path).name}')
+        ws = wb[sheet_name]
+        total_rows = ws.max_row or 0
+        total_cols = ws.max_column or 0
+        start_row = max(1, start_row)
+        end_row = min(start_row + max_rows - 1, total_rows)
+
+        rows: list[list] = []
+        if total_rows and total_cols and start_row <= total_rows:
+            for row in ws.iter_rows(min_row=start_row, max_row=end_row, max_col=total_cols):
+                rows.append([_json_safe(cell.value) for cell in row])
+
+        return {
+            "sheetName": sheet_name,
+            "totalRows": total_rows,
+            "totalCols": total_cols,
+            "startRow": start_row,
+            "rows": rows,
+        }
+    finally:
+        wb.close()
+
+
 def build_output(source_path: str, items: list[dict], dest_path: str) -> list[str]:
     """Monta `dest_path` a partir de uma lista ORDENADA de itens — a ordem
     de `items` é a ordem final das abas no destino (o usuário define isso

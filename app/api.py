@@ -7,7 +7,7 @@ from dataclasses import asdict
 
 import webview
 
-from app.fronts import SheetInfo, build_output, list_sheets
+from app.fronts import SheetInfo, build_output, get_sheet_data, list_sheets
 
 
 class Api:
@@ -34,6 +34,13 @@ class Api:
         abas criadas (pode diferir do original em caso de colisão)."""
         created = build_output(source_path, items, dest_path)
         return json.dumps({"created": created})
+
+    def get_sheet_data(self, path: str, sheet_name: str, start_row: int, max_rows: int) -> str:
+        """Página de linhas de uma aba, para o visualizador de abas do app
+        (menu lateral) mostrar o conteúdo real do Front importado, em vez
+        de só ter gerado um arquivo no disco."""
+        data = get_sheet_data(path, sheet_name, start_row, max_rows)
+        return json.dumps(data)
 
     def pick_dest_file(self) -> str | None:
         """Diálogo de salvar — onde gravar/acrescentar os Fronts importados."""
