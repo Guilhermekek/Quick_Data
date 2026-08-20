@@ -7,7 +7,15 @@ from dataclasses import asdict
 
 import webview
 
-from app.fronts import SheetInfo, build_output, get_sheet_data, list_sheets
+from app.fronts import (
+    SheetInfo,
+    apply_sheet_edits,
+    build_output,
+    delete_sheet_column,
+    get_sheet_data,
+    insert_sheet_column,
+    list_sheets,
+)
 
 
 class Api:
@@ -51,6 +59,34 @@ class Api:
         de só ter gerado um arquivo no disco."""
         data = get_sheet_data(path, sheet_name, start_row, max_rows)
         return json.dumps(data)
+
+    def apply_sheet_edits(
+        self,
+        path: str,
+        sheet_name: str,
+        cell_edits: list[dict],
+        row_colors: list[dict],
+        row_formats: list[dict] | None = None,
+        column_widths: list[dict] | None = None,
+        cell_formats: list[dict] | None = None,
+    ) -> str:
+        """Grava edições de célula, cor/fonte/altura de linha, largura de
+        coluna e formatação por célula direto na aba real do Front
+        (visualizador do menu lateral)."""
+        apply_sheet_edits(path, sheet_name, cell_edits, row_colors, row_formats, column_widths, cell_formats)
+        return json.dumps({"ok": True})
+
+    def delete_sheet_column(self, path: str, sheet_name: str, col: int) -> str:
+        """Remove uma coluna inteira da aba real do Front (todas as
+        linhas da planilha, não só a página visível)."""
+        delete_sheet_column(path, sheet_name, col)
+        return json.dumps({"ok": True})
+
+    def insert_sheet_column(self, path: str, sheet_name: str, col: int) -> str:
+        """Insere uma coluna em branco na aba real do Front (todas as
+        linhas da planilha)."""
+        insert_sheet_column(path, sheet_name, col)
+        return json.dumps({"ok": True})
 
     def pick_dest_file(self) -> str | None:
         """Diálogo de salvar — onde gravar/acrescentar os Fronts importados."""

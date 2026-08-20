@@ -9,11 +9,13 @@ da lista por padrão; o restante é oferecido ao usuário para importar.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
 import openpyxl
-from openpyxl.styles import Font
+from openpyxl.styles import Font, PatternFill
+from openpyxl.utils import get_column_letter
 
 # Nomes de aba que fazem parte da infraestrutura do Quick Data, não são
 # "Fronts" de relatório. Comparação sem diferenciar maiúscula/minúscula.
@@ -66,9 +68,19 @@ def list_sheets(path: str) -> list[SheetInfo]:
         wb.close()
 
 
+_SUFFIX_RE = re.compile(r"\s\((\d+)\)$")
+
+
 def _unique_sheet_name(wb: openpyxl.Workbook, desired: str) -> str:
     """Replica a regra do Form_Importacao original: nome duplicado ganha
-    sufixo numérico incremental em vez de travar a importação (RN-103)."""
+    sufixo numérico incremental em vez de travar a importação (RN-103).
+
+    Normaliza um sufixo " (N)" já existente em `desired` antes de checar
+    colisão — sem isso, reimportar a partir de um arquivo que já tem
+    "Adicoes (2)" (por exemplo, reusando o próprio destino como origem
+    numa sessão de teste) empilhava sufixos: "Adicoes (2) (2)".
+    """
+    desired = _SUFFIX_RE.sub("", desired).strip() or desired
     if desired not in wb.sheetnames:
         return desired
     n = 2
@@ -117,6 +129,137 @@ def get_sheet_data(path: str, sheet_name: str, start_row: int = 1, max_rows: int
             "startRow": start_row,
             "rows": rows,
         }
+    finally:
+        wb.close()
+
+
+def apply_sheet_edits(
+    path: str,
+    sheet_name: str,
+    cell_edits: list[dict],
+    row_colors: list[dict],
+    row_formats: list[dict] | None = None,
+    column_widths: list[dict] | None = None,
+    cell_formats: list[dict] | None = None,
+) -> None:
+    """Grava direto na aba real do arquivo — é o que faz "editar o Front
+    no app" ser edição de verdade, não só um estado que se perde ao virar
+    de página. Abre em modo de escrita (sem `read_only`).
+
+    `cell_edits`: [{"row": int, "col": int, "value": ...}, ...]
+    `row_colors`: [{"row": int, "color": "RRGGBB" ou None (limpa a cor)}, ...]
+    `row_formats`: [{"row": int, "fontFamily": str|None, "fontSize": int|None,
+        "height": float|None}, ...] — fonte/tamanho aplicados em todas as
+        células da linha (mesmo alcance de colunas que row_colors); altura
+        vai em `row_dimensions` (unidade nativa do Excel, pontos).
+    `column_widths`: [{"col": int, "width": float|None}, ...] — largura em
+        `column_dimensions` (unidade nativa do Excel, "caracteres").
+    `cell_formats`: [{"row": int, "col": int, "color": str|None,
+        "fontFamily": str|None, "fontSize": int|None}, ...] — mesma ideia
+        de row_colors/row_formats, mas restrito a UMA célula (o usuário
+        pode formatar a linha inteira OU só uma célula específica dentro
+        dela; célula tem prioridade visual sobre a linha, mas ambas são
+        formatação real do Excel, não algo cosmético só na tela).
+    """
+    wb = openpyxl.load_workbook(path)
+    try:
+        if sheet_name not in wb.sheetnames:
+            raise ValueError(f'Aba "{sheet_name}" não existe em {Path(path).name}')
+        ws = wb[sheet_name]
+
+        for edit in cell_edits:
+            ws.cell(row=edit["row"], column=edit["col"], value=edit["value"])
+
+        max_col = max(ws.max_column or 1, 1)
+        for rc in row_colors:
+            color = rc.get("color")
+            fill = (
+                PatternFill(start_color=color, end_color=color, fill_type="solid")
+                if color
+                else PatternFill(fill_type=None)
+            )
+            for col in range(1, max_col + 1):
+                ws.cell(row=rc["row"], column=col).fill = fill
+
+        for rf in row_formats or []:
+            row = rf["row"]
+            family = rf.get("fontFamily")
+            size = rf.get("fontSize")
+            if family or size:
+                for col in range(1, max_col + 1):
+                    cell = ws.cell(row=row, column=col)
+                    base = cell.font
+                    cell.font = Font(
+                        name=family or base.name,
+                        size=size or base.size,
+                        bold=base.bold, italic=base.italic, color=base.color,
+                    )
+            height = rf.get("height")
+            if height is not None:
+                ws.row_dimensions[row].height = height or None
+
+        for cw in column_widths or []:
+            letter = get_column_letter(cw["col"])
+            width = cw.get("width")
+            ws.column_dimensions[letter].width = width or None
+
+        for cf in cell_formats or []:
+            cell = ws.cell(row=cf["row"], column=cf["col"])
+            color = cf.get("color")
+            cell.fill = (
+                PatternFill(start_color=color, end_color=color, fill_type="solid")
+                if color
+                else PatternFill(fill_type=None)
+            )
+            family = cf.get("fontFamily")
+            size = cf.get("fontSize")
+            if family or size:
+                base = cell.font
+                cell.font = Font(
+                    name=family or base.name,
+                    size=size or base.size,
+                    bold=base.bold, italic=base.italic, color=base.color,
+                )
+
+        wb.save(path)
+    finally:
+        wb.close()
+
+
+def delete_sheet_column(path: str, sheet_name: str, col: int) -> None:
+    """Remove uma coluna inteira da aba — desloca as colunas seguintes
+    para a esquerda em TODAS as linhas da planilha (igual ao Excel),
+    não só na página visível no momento. `col` é 1-based (A=1, B=2, ...).
+    """
+    wb = openpyxl.load_workbook(path)
+    try:
+        if sheet_name not in wb.sheetnames:
+            raise ValueError(f'Aba "{sheet_name}" não existe em {Path(path).name}')
+        ws = wb[sheet_name]
+        ws.delete_cols(col, 1)
+        wb.save(path)
+    finally:
+        wb.close()
+
+
+def insert_sheet_column(path: str, sheet_name: str, col: int) -> None:
+    """Insere uma coluna em branco na aba real — desloca as colunas a
+    partir de `col` para a direita em TODAS as linhas da planilha.
+    `col` é 1-based; para acrescentar no fim, use totalCols + 1.
+
+    Escreve uma célula vazia na primeira linha da coluna nova: sem isso
+    o openpyxl não "registra" a coluna (nenhuma célula com valor nela),
+    e ela não apareceria no viewer, que usa `max_column` pra saber
+    quantas colunas existem.
+    """
+    wb = openpyxl.load_workbook(path)
+    try:
+        if sheet_name not in wb.sheetnames:
+            raise ValueError(f'Aba "{sheet_name}" não existe em {Path(path).name}')
+        ws = wb[sheet_name]
+        ws.insert_cols(col, 1)
+        ws.cell(row=1, column=col, value="")
+        wb.save(path)
     finally:
         wb.close()
 
