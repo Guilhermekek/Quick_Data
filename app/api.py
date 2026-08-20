@@ -15,9 +15,19 @@ class Api:
         """Abre o diálogo nativo de seleção de arquivo. Devolve o caminho
         escolhido ou None se o usuário cancelou."""
         result = webview.windows[0].create_file_dialog(
-            webview.OPEN_DIALOG,
+            webview.FileDialog.OPEN,
             file_types=("Planilhas Excel (*.xlsx;*.xlsm)", "Todos os arquivos (*.*)"),
         )
+        if not result:
+            return None
+        return result[0]
+
+    def pick_folder(self) -> str | None:
+        """Diálogo nativo de seleção de pasta — usado por fontes que leem
+        vários arquivos de um diretório em vez de um arquivo único (ex.:
+        Other Income, RN-030 na doc técnica: única fonte multi-arquivo do
+        Quick Data original)."""
+        result = webview.windows[0].create_file_dialog(webview.FileDialog.FOLDER)
         if not result:
             return None
         return result[0]
@@ -45,7 +55,7 @@ class Api:
     def pick_dest_file(self) -> str | None:
         """Diálogo de salvar — onde gravar/acrescentar os Fronts importados."""
         result = webview.windows[0].create_file_dialog(
-            webview.SAVE_DIALOG,
+            webview.FileDialog.SAVE,
             save_filename="BASE_QUICK_DATA.xlsx",
             file_types=("Planilha Excel (*.xlsx)",),
         )

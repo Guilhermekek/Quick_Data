@@ -1558,6 +1558,21 @@ a:hover { color: var(--brand-primary-hover); text-decoration: underline; }
               </button>
             </div>
           </sc-if>
+          <sc-if value="{{ extractModal.hasPasta }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; gap: 6px">
+              <label style="font-size: 12px; font-weight: 500; color: var(--fg-muted)">Pasta (lê todos os arquivos dentro)</label>
+              <button onClick="{{ extractModal.pickFolder }}" style="height: var(--row-h); padding: 0 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); color: var(--fg); font-size: 13px; text-align: left" style-hover="background: var(--surface-hover)">
+                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ extractModal.pastaLabel }}</span>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--fg-faint)" style="flex: none"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" stroke-width="1.7" stroke-linejoin="round"></path></svg>
+              </button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ extractModal.hasCriterio }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; gap: 6px">
+              <label style="font-size: 12px; font-weight: 500; color: var(--fg-muted)">Critério de nome do arquivo</label>
+              <input value="{{ extractModal.criterio }}" onChange="{{ extractModal.setCriterio }}" placeholder="ex.: Other_Income_* (aceita * como coringa)" style="height: var(--row-h); padding: 0 12px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); color: var(--fg); font-size: 13px" />
+            </div>
+          </sc-if>
         </div>
         <div style="padding: 14px 24px; border-top: 1px solid var(--border); background: var(--surface-2); display: flex; align-items: center; justify-content: flex-end; gap: 8px">
           <button onClick="{{ closeModal }}" style="height: var(--row-h); padding: 0 14px; border-radius: var(--radius); border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg); font-size: 13px; font-weight: 600" style-hover="background: var(--surface-hover)">Cancelar</button>
@@ -2021,6 +2036,7 @@ class Component extends DCLogic {
     extractForm: {
       kpi: "ACT > Divulgado", ano: String(new Date().getFullYear()),
       arquivo: null, aba: "", mesIni: "Jan", mesFim: "Dez", mesPreview: "Jan",
+      pasta: null, criterio: "",
     },
     selUser: null,
     newUser: { id: "", name: "", area: "P&C · Consolidation", role: "user" },
@@ -2347,6 +2363,19 @@ class Component extends DCLogic {
     this.setState(s => ({ extractForm: { ...s.extractForm, arquivo: path } }));
   };
 
+  // Other Income é a única fonte multi-arquivo do Quick Data original —
+  // aponta pra uma pasta inteira + um critério de nome (wildcard), em
+  // vez de um arquivo único (RN-030).
+  pickExtractFolder = async () => {
+    if (!window.pywebview || !window.pywebview.api) {
+      this.setState({ toast: "App Python não conectado — abra pelo executável (não pelo navegador)." });
+      return;
+    }
+    const path = await window.pywebview.api.pick_folder();
+    if (!path) return;
+    this.setState(s => ({ extractForm: { ...s.extractForm, pasta: path } }));
+  };
+
   confirmExtractParams = () => {
     const source = this.state.extractSource;
     this.setState({ modal: null, extractDropdownOpen: null });
@@ -2667,14 +2696,14 @@ class Component extends DCLogic {
       { name: "AJUSTES", table: "Base de ajustes manuais", rows: "146", last: "há 20min", tone: "info", label: "6 linhas novas" },
     ];
     const toneColor = { ok: "var(--status-ok)", warn: "var(--status-warn)", err: "var(--status-err)", neutral: "var(--status-neutral)", info: "var(--status-info)" };
-    // MOCKUP RGM ainda não tem sua tela de parâmetros própria (aba de
-    // origem + Ano) — segue direto pro erro simulado, como antes. RGM já
-    // passa pelo modal de parâmetros e só erra na confirmação.
-    const failMap = { "MOCKUP RGM": "file" };
+    // Todas as fontes passam pelo modal de parâmetros; RGM e MOCKUP RGM
+    // só erram na confirmação (ver confirmExtractParams), mantendo o
+    // mesmo cenário de demo (erro de SQL / arquivo com estrutura errada)
+    // que já existia antes do modal.
     const sources = SOURCES.map(x => ({
       ...x,
       color: toneColor[x.tone],
-      run: failMap[x.name] ? this.openError(failMap[x.name]) : this.openExtractParams(x.name),
+      run: this.openExtractParams(x.name),
     }));
 
     const MONTHS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
@@ -3056,7 +3085,7 @@ class Component extends DCLogic {
         const fields = this.EXTRACT_FIELDS[s.extractSource] || [];
         const has = (k) => fields.includes(k);
         const f = s.extractForm;
-        const needsFile = has("arquivo") && !f.arquivo;
+        const needsFile = (has("arquivo") && !f.arquivo) || (has("pasta") && !f.pasta);
         const open = s.extractDropdownOpen;
         const dropdown = (key, current, options) => ({
           open: open === key, toggle: this.toggleExtractDropdown(key),
@@ -3067,11 +3096,13 @@ class Component extends DCLogic {
           source: s.extractSource,
           hasKpi: has("kpi"), hasAno: has("ano"), hasArquivo: has("arquivo"),
           hasAba: has("aba"), hasMesIni: has("mesIni"), hasMesFim: has("mesFim"),
-          hasMesPreview: has("mesPreview"),
-          ano: f.ano, aba: f.aba,
+          hasMesPreview: has("mesPreview"), hasPasta: has("pasta"), hasCriterio: has("criterio"),
+          ano: f.ano, aba: f.aba, criterio: f.criterio,
           arquivoLabel: f.arquivo ? f.arquivo.split("\\").pop() : "Nenhum arquivo selecionado",
+          pastaLabel: f.pasta || "Nenhuma pasta selecionada",
           setAno: this.setExtractField("ano"), setAba: this.setExtractField("aba"),
-          pickFile: this.pickExtractFile,
+          setCriterio: this.setExtractField("criterio"),
+          pickFile: this.pickExtractFile, pickFolder: this.pickExtractFolder,
           kpiDrop: dropdown("kpi", f.kpi, this.KPI_VERSAO_OPTIONS),
           mesIniDrop: dropdown("mesIni", f.mesIni, MONTHS),
           mesFimDrop: dropdown("mesFim", f.mesFim, MONTHS),
