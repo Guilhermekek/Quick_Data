@@ -7,7 +7,7 @@ from dataclasses import asdict
 
 import webview
 
-from app.fronts import SheetInfo, import_fronts, list_sheets
+from app.fronts import SheetInfo, build_output, list_sheets
 
 
 class Api:
@@ -27,11 +27,12 @@ class Api:
         sheets: list[SheetInfo] = list_sheets(path)
         return json.dumps([asdict(s) for s in sheets])
 
-    def import_fronts(self, source_path: str, sheet_names: list[str], dest_path: str) -> str:
-        """Importa as abas selecionadas para dest_path. Devolve JSON com
-        os nomes finais das abas criadas (pode diferir do original em
-        caso de colisão de nome)."""
-        created = import_fronts(source_path, sheet_names, dest_path)
+    def build_output(self, source_path: str, items: list[dict], dest_path: str) -> str:
+        """Monta dest_path a partir da lista ordenada `items` (Fronts
+        copiados de source_path e/ou abas novas criadas na tela — ver
+        app.fronts.build_output). Devolve JSON com os nomes finais das
+        abas criadas (pode diferir do original em caso de colisão)."""
+        created = build_output(source_path, items, dest_path)
         return json.dumps({"created": created})
 
     def pick_dest_file(self) -> str | None:

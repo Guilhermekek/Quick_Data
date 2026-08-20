@@ -1098,9 +1098,9 @@ a:hover { color: var(--brand-primary-hover); text-decoration: underline; }
             <div style="display: flex; flex-direction: column; gap: 6px">
               <label style="font-size: 12px; font-weight: 500; color: var(--fg-muted)">Severidade</label>
               <div style="display: flex; gap: 6px">
-                <button style="flex: 1; height: var(--row-h); border-radius: var(--radius); border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg-muted); font-size: 12px; font-weight: 600" style-hover="background: var(--surface-hover)">Baixa</button>
-                <button style="flex: 1; height: var(--row-h); border-radius: var(--radius); border: 1px solid var(--status-warn); background: color-mix(in oklab, var(--status-warn) 12%, transparent); color: var(--status-warn); font-size: 12px; font-weight: 700">Média</button>
-                <button style="flex: 1; height: var(--row-h); border-radius: var(--radius); border: 1px solid var(--border-strong); background: var(--surface); color: var(--fg-muted); font-size: 12px; font-weight: 600" style-hover="background: var(--surface-hover)">Alta</button>
+                <button onClick="{{ setSeverityBaixa }}" style="flex: 1; height: var(--row-h); border-radius: var(--radius); border: 1px solid {{ severityBaixaBorder }}; background: {{ severityBaixaBg }}; color: {{ severityBaixaFg }}; font-size: 12px; font-weight: {{ severityBaixaWeight }}" style-hover="background: var(--surface-hover)">Baixa</button>
+                <button onClick="{{ setSeverityMedia }}" style="flex: 1; height: var(--row-h); border-radius: var(--radius); border: 1px solid {{ severityMediaBorder }}; background: {{ severityMediaBg }}; color: {{ severityMediaFg }}; font-size: 12px; font-weight: {{ severityMediaWeight }}" style-hover="background: var(--surface-hover)">Média</button>
+                <button onClick="{{ setSeverityAlta }}" style="flex: 1; height: var(--row-h); border-radius: var(--radius); border: 1px solid {{ severityAltaBorder }}; background: {{ severityAltaBg }}; color: {{ severityAltaFg }}; font-size: 12px; font-weight: {{ severityAltaWeight }}" style-hover="background: var(--surface-hover)">Alta</button>
               </div>
             </div>
           </div>
@@ -1286,10 +1286,10 @@ a:hover { color: var(--brand-primary-hover); text-decoration: underline; }
                 <span>Disponível</span><span>{{ availCount }}</span>
               </div>
               <div style="height: 280px; overflow: auto; padding: 8px; display: flex; flex-direction: column; gap: 6px">
-                <sc-for list="{{ available }}" as="item" hint-placeholder-count="8">
-                  <button onClick="{{ pickAvail }}" style="display: flex; align-items: center; gap: 10px; text-align: left; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); font-size: 12.5px; font-weight: 500; color: var(--fg)" style-hover="background: var(--surface-hover); border-color: var(--border-strong)">
+                <sc-for list="{{ available }}" as="row" hint-placeholder-count="8">
+                  <button onClick="{{ row.pick }}" style="display: flex; align-items: center; gap: 10px; text-align: left; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); font-size: 12.5px; font-weight: 500; color: var(--fg)" style-hover="background: var(--surface-hover); border-color: var(--border-strong)">
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--fg-faint)" style="flex: none"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5zM14 3v5h5" stroke-width="1.7" stroke-linejoin="round"></path></svg>
-                    {{ item }}
+                    {{ row.name }}
                   </button>
                 </sc-for>
               </div>
@@ -1307,12 +1307,39 @@ a:hover { color: var(--brand-primary-hover); text-decoration: underline; }
                 <span>Selecionado</span><span>{{ selCount }}</span>
               </div>
               <div style="height: 280px; overflow: auto; padding: 8px; display: flex; flex-direction: column; gap: 6px">
-                <sc-for list="{{ selectedItems }}" as="item" hint-placeholder-count="2">
-                  <button onClick="{{ pickSel }}" style="display: flex; align-items: center; gap: 10px; text-align: left; padding: 9px 12px; border: 1px solid color-mix(in oklab, var(--brand-primary) 30%, transparent); border-radius: var(--radius-sm); background: color-mix(in oklab, var(--brand-primary) 8%, transparent); font-size: 12.5px; font-weight: 600; color: var(--fg)" style-hover="background: color-mix(in oklab, var(--brand-primary) 14%, transparent)">
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--brand-primary)" style="flex: none"><path d="m5 12 4.5 4.5L19 7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                    {{ item }}
-                  </button>
+                <sc-for list="{{ selectedItems }}" as="row" hint-placeholder-count="2">
+                  <sc-if value="{{ row.isNew }}" hint-placeholder-val="{{ false }}">
+                    <div draggable="{{ true }}" onDragStart="{{ row.dragStart }}" onDragOver="{{ dragOverSel }}" onDrop="{{ row.drop }}" onDragEnd="{{ dragEndSel }}" style="border: 1.5px dashed var(--brand-primary); border-radius: var(--radius-sm); background: color-mix(in oklab, var(--brand-primary) 6%, transparent); padding: 8px 10px; display: flex; flex-direction: column; gap: 8px; cursor: grab">
+                      <div style="display: flex; align-items: center; gap: 8px">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="var(--fg-faint)" style="flex: none"><circle cx="9" cy="6" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="9" cy="12" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="9" cy="18" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="15" cy="6" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="15" cy="12" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="15" cy="18" r="1.3" fill="currentColor" stroke="none"></circle></svg>
+                        <input value="{{ row.name }}" onChange="{{ row.rename }}" placeholder="Nome da aba" style="flex: 1; border: 1px solid var(--border-strong); border-radius: 4px; padding: 5px 8px; font-size: 12.5px; font-weight: 600; background: var(--surface); color: var(--fg)" />
+                        <button onClick="{{ row.remove }}" title="Remover aba" style="display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; border: 0; background: transparent; color: var(--status-err); flex: none">
+                          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"><path d="M6 6l12 12M18 6 6 18" stroke-width="2" stroke-linecap="round"></path></svg>
+                        </button>
+                      </div>
+                      <div style="display: flex; flex-wrap: wrap; gap: 5px; padding-left: 21px">
+                        <sc-for list="{{ row.columnItems }}" as="col" hint-placeholder-count="2">
+                          <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 4px 2px 8px; border: 1px solid var(--border-strong); border-radius: 999px; background: var(--surface)">
+                            <input value="{{ col.value }}" onChange="{{ col.rename }}" style="border: 0; background: transparent; width: 76px; font-size: 11px; color: var(--fg)" />
+                            <button onClick="{{ col.remove }}" style="display: grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; border: 0; background: transparent; color: var(--fg-faint)">
+                              <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor"><path d="M6 6l12 12M18 6 6 18" stroke-width="2.4" stroke-linecap="round"></path></svg>
+                            </button>
+                          </span>
+                        </sc-for>
+                        <button onClick="{{ row.addColumn }}" style="padding: 3px 10px; border: 1px dashed var(--border-strong); border-radius: 999px; font-size: 11px; font-weight: 600; color: var(--fg-muted); background: transparent" style-hover="border-color: var(--brand-primary); color: var(--brand-primary)">+ coluna</button>
+                      </div>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ !row.isNew }}" hint-placeholder-val="{{ true }}">
+                    <button draggable="{{ true }}" onDragStart="{{ row.dragStart }}" onDragOver="{{ dragOverSel }}" onDrop="{{ row.drop }}" onDragEnd="{{ dragEndSel }}" onClick="{{ row.pick }}" style="display: flex; align-items: center; gap: 10px; text-align: left; padding: 9px 12px; border: 1px solid color-mix(in oklab, var(--brand-primary) 30%, transparent); border-radius: var(--radius-sm); background: color-mix(in oklab, var(--brand-primary) 8%, transparent); font-size: 12.5px; font-weight: 600; color: var(--fg); cursor: grab" style-hover="background: color-mix(in oklab, var(--brand-primary) 14%, transparent)">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="var(--fg-faint)" style="flex: none"><circle cx="9" cy="6" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="9" cy="12" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="9" cy="18" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="15" cy="6" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="15" cy="12" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="15" cy="18" r="1.3" fill="currentColor" stroke="none"></circle></svg>
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--brand-primary)" style="flex: none"><path d="m5 12 4.5 4.5L19 7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                      {{ row.name }}
+                    </button>
+                  </sc-if>
                 </sc-for>
+
+                <button onClick="{{ addNewSheet }}" style="border: 1.5px dashed var(--border-strong); border-radius: var(--radius-sm); padding: 10px 12px; text-align: center; font-size: 12px; font-weight: 700; letter-spacing: .02em; color: var(--fg-muted); background: transparent; flex: none" style-hover="border-color: var(--brand-primary); color: var(--brand-primary); background: color-mix(in oklab, var(--brand-primary) 5%, transparent)">– – – – Nova Aba – – – –</button>
               </div>
             </div>
           </div>
@@ -1774,6 +1801,7 @@ class Component extends DCLogic {
     bugPickOpen: false,
     bugFile: null,
     bugKind: "bug",
+    bugSeverity: "media",
     videoOpen: false,
     videoChapter: 0,
     notifWindows: true,
@@ -1951,13 +1979,17 @@ class Component extends DCLogic {
     const dest = await window.pywebview.api.pick_dest_file();
     if (!dest) return;
 
+    const items = s.selected.map(x => typeof x === "string"
+      ? { type: "front", name: x }
+      : { type: "new", name: x.name, columns: x.columns });
+
     this.setState({ ioBusy: true });
     try {
-      const json = await window.pywebview.api.import_fronts(s.sourcePath, s.selected, dest);
+      const json = await window.pywebview.api.build_output(s.sourcePath, items, dest);
       const result = JSON.parse(json);
       this.setState({
         modal: null, ioBusy: false,
-        toast: result.created.length + " aba(s) importada(s) para " + dest.split("\\").pop() + ": " + result.created.join(", "),
+        toast: result.created.length + " aba(s) criada(s) em " + dest.split("\\").pop() + ": " + result.created.join(", "),
       });
     } catch (err) {
       this.setState({ ioBusy: false, toast: "Falha ao importar: " + err });
@@ -1979,8 +2011,81 @@ class Component extends DCLogic {
 
   exclude = () => this.setState(s => {
     if (!s.pickB) return s;
-    return { selected: s.selected.filter(x => x !== s.pickB), available: [...s.available, s.pickB], pickB: null };
+    const isNewSheet = typeof s.pickB !== "string";
+    return {
+      selected: s.selected.filter(x => x !== s.pickB),
+      available: isNewSheet ? s.available : [...s.available, s.pickB],
+      pickB: null,
+    };
   });
+
+  // "Nova Aba": aba em branco criada na hora, com nome e colunas de
+  // cabeçalho customizáveis, misturada na mesma lista "selected" dos
+  // Fronts vindos do arquivo — a ordem de arraste vira a ordem final
+  // das abas no arquivo gerado (ver app.fronts.build_output).
+  addNewSheet = () => this.setState(s => {
+    const n = s.selected.filter(x => typeof x !== "string").length + 1;
+    const id = "new_" + Date.now() + "_" + Math.floor(Math.random() * 1e4);
+    return { selected: [...s.selected, { id, name: "Nova aba " + n, columns: ["Coluna 1"] }] };
+  });
+
+  removeNewSheet = (id) => () => this.setState(s => ({
+    selected: s.selected.filter(x => typeof x === "string" || x.id !== id),
+  }));
+
+  renameNewSheet = (id) => (e) => {
+    const name = e.target.value;
+    this.setState(s => ({
+      selected: s.selected.map(x => (typeof x !== "string" && x.id === id) ? { ...x, name } : x),
+    }));
+  };
+
+  addColumn = (id) => () => this.setState(s => ({
+    selected: s.selected.map(x => (typeof x !== "string" && x.id === id)
+      ? { ...x, columns: [...x.columns, "Coluna " + (x.columns.length + 1)] } : x),
+  }));
+
+  renameColumn = (id, idx) => (e) => {
+    const value = e.target.value;
+    this.setState(s => ({
+      selected: s.selected.map(x => (typeof x !== "string" && x.id === id)
+        ? { ...x, columns: x.columns.map((c, i) => (i === idx ? value : c)) } : x),
+    }));
+  };
+
+  removeColumn = (id, idx) => () => this.setState(s => ({
+    selected: s.selected.map(x => (typeof x !== "string" && x.id === id)
+      ? { ...x, columns: x.columns.filter((_, i) => i !== idx) } : x),
+  }));
+
+  // Arrastar para reordenar a lista "Selecionado" (Fronts + Novas Abas
+  // misturados). A chave de drag fica num campo de instância, não em
+  // state, porque não precisa re-renderizar nada durante o arraste.
+  dragStartSel = (dragKey) => (e) => {
+    this.__dragKey = dragKey;
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  dragOverSel = (e) => { e.preventDefault(); };
+
+  dragEndSel = () => { this.__dragKey = null; };
+
+  dropOnSel = (targetKey) => (e) => {
+    e.preventDefault();
+    const fromKey = this.__dragKey;
+    this.__dragKey = null;
+    if (fromKey == null || fromKey === targetKey) return;
+    this.setState(s => {
+      const keyOf = (x) => (typeof x === "string" ? x : x.id);
+      const arr = s.selected.slice();
+      const fromIdx = arr.findIndex(x => keyOf(x) === fromKey);
+      const toIdx = arr.findIndex(x => keyOf(x) === targetKey);
+      if (fromIdx < 0 || toIdx < 0) return null;
+      const [moved] = arr.splice(fromIdx, 1);
+      arr.splice(toIdx, 0, moved);
+      return { selected: arr };
+    });
+  };
 
   dismissToast = () => this.setState({ toast: null });
 
@@ -2004,6 +2109,7 @@ class Component extends DCLogic {
   };
   clearBugFile = () => this.setState({ bugFile: null });
   setBugKind = (bugKind) => () => this.setState({ bugKind });
+  setBugSeverity = (bugSeverity) => () => this.setState({ bugSeverity });
 
   toggleNotif = (key) => () => this.setState(s => ({ [key]: !s[key] }));
   toggleTeamsPick = () => this.setState(s => ({ teamsPickOpen: !s.teamsPickOpen }));
@@ -2315,6 +2421,19 @@ class Component extends DCLogic {
       kindBugFg: s.bugKind === "bug" ? "#fff" : "var(--fg)",
       kindIdeaBg: s.bugKind === "idea" ? "var(--brand-primary)" : "var(--surface)",
       kindIdeaFg: s.bugKind === "idea" ? "#fff" : "var(--fg)",
+      setSeverityBaixa: this.setBugSeverity("baixa"), setSeverityMedia: this.setBugSeverity("media"), setSeverityAlta: this.setBugSeverity("alta"),
+      severityBaixaBorder: s.bugSeverity === "baixa" ? "var(--status-ok)" : "var(--border-strong)",
+      severityBaixaBg: s.bugSeverity === "baixa" ? "color-mix(in oklab, var(--status-ok) 12%, transparent)" : "var(--surface)",
+      severityBaixaFg: s.bugSeverity === "baixa" ? "var(--status-ok)" : "var(--fg-muted)",
+      severityBaixaWeight: s.bugSeverity === "baixa" ? "700" : "600",
+      severityMediaBorder: s.bugSeverity === "media" ? "var(--status-warn)" : "var(--border-strong)",
+      severityMediaBg: s.bugSeverity === "media" ? "color-mix(in oklab, var(--status-warn) 12%, transparent)" : "var(--surface)",
+      severityMediaFg: s.bugSeverity === "media" ? "var(--status-warn)" : "var(--fg-muted)",
+      severityMediaWeight: s.bugSeverity === "media" ? "700" : "600",
+      severityAltaBorder: s.bugSeverity === "alta" ? "var(--status-err)" : "var(--border-strong)",
+      severityAltaBg: s.bugSeverity === "alta" ? "color-mix(in oklab, var(--status-err) 12%, transparent)" : "var(--surface)",
+      severityAltaFg: s.bugSeverity === "alta" ? "var(--status-err)" : "var(--fg-muted)",
+      severityAltaWeight: s.bugSeverity === "alta" ? "700" : "600",
       bugTitle: s.bugKind === "bug" ? "Relatar bug" : "Solicitar melhoria",
       bugSub: s.bugKind === "bug" ? "O log da última execução é anexado automaticamente" : "A sugestão vai para o backlog do time de P&C, com voto dos outros usuários",
       bugCta: s.bugKind === "bug" ? "Enviar relato" : "Enviar solicitação",
@@ -2428,9 +2547,27 @@ class Component extends DCLogic {
       openInfo: this.openModal("info"),
       ioTitle: s.ioMode === "export" ? "Exportar BASE e/ou FRONT(S)" : "Importar BASE e/ou FRONT(S)",
       ioVerb: s.ioMode === "export" ? "Exportar" : "Importar",
-      available: s.available, selectedItems: s.selected,
+      available: s.available.map(name => ({ name, pick: this.pick("a", name) })),
+      selectedItems: s.selected.map(raw => {
+        const isNew = typeof raw !== "string";
+        const key = isNew ? raw.id : raw;
+        return {
+          key, isNew, name: isNew ? raw.name : raw,
+          pick: this.pick("b", raw),
+          remove: isNew ? this.removeNewSheet(raw.id) : null,
+          rename: isNew ? this.renameNewSheet(raw.id) : null,
+          addColumn: isNew ? this.addColumn(raw.id) : null,
+          columnItems: isNew ? raw.columns.map((c, idx) => ({
+            idx, value: c,
+            rename: this.renameColumn(raw.id, idx),
+            remove: this.removeColumn(raw.id, idx),
+          })) : [],
+          dragStart: this.dragStartSel(key), drop: this.dropOnSel(key),
+        };
+      }),
+      dragOverSel: this.dragOverSel, dragEndSel: this.dragEndSel,
       selCount: s.selected.length, availCount: s.available.length,
-      pickAvail: (item) => this.pick("a", item), pickSel: (item) => this.pick("b", item),
+      addNewSheet: this.addNewSheet,
       include: this.include, exclude: this.exclude,
       confirmIO: this.confirmIO,
       ioSingle: s.ioSingle, ioPerItem: !s.ioSingle,

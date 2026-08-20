@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import openpyxl
-from openpyxl.utils import get_column_letter
+from openpyxl.styles import Font
 
 # Nomes de aba que fazem parte da infraestrutura do Quick Data, não são
 # "Fronts" de relatório. Comparação sem diferenciar maiúscula/minúscula.
@@ -77,12 +77,20 @@ def _unique_sheet_name(wb: openpyxl.Workbook, desired: str) -> str:
     return f"{desired} ({n})"
 
 
-def import_fronts(source_path: str, sheet_names: list[str], dest_path: str) -> list[str]:
-    """Copia os Fronts selecionados de `source_path` para `dest_path`
-    (criado do zero se não existir). Só valores + largura de coluna +
-    formato numérico são preservados nesta primeira versão — fórmulas
-    não são copiadas (mesma simplificação que a exportação de Front do
-    VBA original já fazia: converte fórmula em valor antes de exportar).
+def build_output(source_path: str, items: list[dict], dest_path: str) -> list[str]:
+    """Monta `dest_path` a partir de uma lista ORDENADA de itens — a ordem
+    de `items` é a ordem final das abas no destino (o usuário define isso
+    arrastando na tela). Cada item é:
+      - {"type": "front", "name": ...} — copia a aba de `source_path`.
+        Só valores + largura de coluna + formato numérico são preservados
+        (fórmulas não são copiadas, mesma simplificação que a exportação
+        de Front do VBA original já fazia).
+      - {"type": "new", "name": ..., "columns": [...]} — cria uma aba em
+        branco com esses títulos de coluna na primeira linha (botão
+        "Nova Aba" da tela de importação/exportação).
+
+    Acrescenta a um `dest_path` já existente, como o Form_Importacao
+    original fazia, em vez de sempre sobrescrever do zero.
 
     Retorna a lista de nomes finais das abas criadas no destino.
     """
@@ -98,24 +106,32 @@ def import_fronts(source_path: str, sheet_names: list[str], dest_path: str) -> l
 
     created: list[str] = []
     try:
-        for name in sheet_names:
-            if name not in src.sheetnames:
-                continue
-            src_ws = src[name]
-            final_name = _unique_sheet_name(dest, name)
-            dst_ws = dest.create_sheet(title=final_name[:31])  # limite do Excel
+        for item in items:
+            desired = (item.get("name") or "Nova aba").strip() or "Nova aba"
+            final_name = _unique_sheet_name(dest, desired[:31])  # limite do Excel
 
-            for row in src_ws.iter_rows():
-                for cell in row:
-                    if cell.value is None:
-                        continue
-                    dst_ws.cell(row=cell.row, column=cell.column, value=cell.value)
-                    if cell.number_format:
-                        dst_ws.cell(row=cell.row, column=cell.column).number_format = cell.number_format
+            if item.get("type") == "new":
+                dst_ws = dest.create_sheet(title=final_name)
+                for col_idx, header in enumerate(item.get("columns") or [], start=1):
+                    cell = dst_ws.cell(row=1, column=col_idx, value=header)
+                    cell.font = Font(bold=True)
+            else:
+                if desired not in src.sheetnames:
+                    continue
+                src_ws = src[desired]
+                dst_ws = dest.create_sheet(title=final_name)
 
-            for col_idx, dim in getattr(src_ws, "column_dimensions", {}).items():
-                if dim.width:
-                    dst_ws.column_dimensions[col_idx].width = dim.width
+                for row in src_ws.iter_rows():
+                    for cell in row:
+                        if cell.value is None:
+                            continue
+                        dst_ws.cell(row=cell.row, column=cell.column, value=cell.value)
+                        if cell.number_format:
+                            dst_ws.cell(row=cell.row, column=cell.column).number_format = cell.number_format
+
+                for col_idx, dim in getattr(src_ws, "column_dimensions", {}).items():
+                    if dim.width:
+                        dst_ws.column_dimensions[col_idx].width = dim.width
 
             created.append(final_name)
 
