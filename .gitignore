@@ -7,19 +7,10 @@ node_modules/
 .idea/
 .claude/
 
-# App novo (Python + React) — build gerado, não versionar
-frontend/dist/
-frontend/package-lock.json
-
-# Fonte bruta do Quick Data — contém credencial de banco em texto plano
-# (achado de segurança já documentado; nunca deve ir para o GitHub)
-Quick Data 3.23.xlsb
-vba_dump_tmp/
-
-# Cópia recebida para análise pontual (37MB, dado real de terceiros) — nunca versionar
-QD 3.23 - P2_vf.xlsx
-
-# Artefatos de build/QA
-docs/apresentacao/*.pdf
-docs/apresentacao/*.jpg
-docs/apresentacao/package-lock.json
+# Só o app (Front = app/ui, Back = app/*.py) vai pro GitHub. Tudo que
+# não é código do app — documentação, fonte do design, scaffold antigo
+# do frontend, scripts de build ligados a ele, e os arquivos originais
+# do Quick Data (um deles com credencial de banco em texto plano, achado
+# de segurança já documentado — nunca deve ir para o GitHub) — fica
+# arquivado localmente aqui, fora do repositório.
+_arquivo/
